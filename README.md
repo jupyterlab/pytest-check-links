@@ -23,3 +23,4 @@ TODO:
 - options for validating links (allow absolute links, only remote or local, etc.)
 - check internal links (`#anchors`)
 - find URLs in Python docstrings
+- test myself, obvs!
