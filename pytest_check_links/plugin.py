@@ -115,7 +115,7 @@ class LinkItem(pytest.Item):
 
         name, parent: inherited from pytest.Item
         target (str): The URL or path target for the link
-        fspath (localpath): The file containing the link (for relative URLs)
+        description (str, optional): The description to be used in the report header
     """
     def __init__(self, name, parent, target, description=''):
         super(LinkItem, self).__init__(name, parent)
