@@ -1,5 +1,6 @@
 import os
 from six.moves.urllib.request import urlopen
+from six.moves.urllib.parse import unquote
 
 import html5lib
 import pytest
@@ -147,7 +148,13 @@ class LinkItem(pytest.Item):
             if self.target.startswith('/'):
                 raise BrokenLinkError(self.target, "absolute path link")
             # relative URL
-            url_path = self.target.replace('/', os.path.sep)
+            url = self.target
+            if '?' in url:
+                url = url.split('?')[0]
+            if '#' in url:
+                url = url.split('#')[0]
+
+            url_path = unquote(url).replace('/', os.path.sep)
             target_path = self.fspath.dirpath().join(url_path)
             if not target_path.exists():
                 raise BrokenLinkError(self.target, "No such file: %s" % target_path)
