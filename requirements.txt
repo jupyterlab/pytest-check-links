@@ -1,2 +1,5 @@
 pytest >= 2.8
 html5lib
+six
+nbformat
+nbconvert
