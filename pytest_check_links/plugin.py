@@ -1,5 +1,5 @@
 import os
-from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import urlopen, Request
 from six.moves.urllib.parse import unquote
 
 import html5lib
@@ -120,7 +120,7 @@ class LinkItem(pytest.Item):
     def __init__(self, name, parent, target, description=''):
         super(LinkItem, self).__init__(name, parent)
         self.target = target
-        self.description = description or target
+        self.description = description or '{}: {}'.format(self.fspath, target)
 
     def repr_failure(self, excinfo):
         exc = excinfo.value
@@ -135,8 +135,10 @@ class LinkItem(pytest.Item):
     def runtest(self):
         if ':' in self.target:
             # external reference, download
+            req = Request(self.target)
+            req.add_header('User-Agent', 'pytest-check-links')
             try:
-                f = urlopen(self.target)
+                f = urlopen(req)
             except Exception as e:
                 raise BrokenLinkError(self.target, str(e))
             else:
