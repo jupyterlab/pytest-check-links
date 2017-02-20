@@ -1,3 +1,4 @@
+import io
 import os
 from six.moves.urllib.request import urlopen, Request
 from six.moves.urllib.parse import unquote
@@ -24,14 +25,14 @@ class CheckLinks(pytest.File):
     """Check the links in a file"""
     def _html_from_html(self):
         """Return HTML from an HTML file"""
-        with open(str(self.fspath), encoding=_ENC) as f:
+        with io.open(str(self.fspath), encoding=_ENC) as f:
             return f.read()
     
     def _html_from_markdown(self):
         """Return HTML from a markdown file"""
         # FIXME: use commonmark or a pluggable engine
         from nbconvert.filters import markdown2html
-        with open(str(self.fspath), encoding=_ENC) as f:
+        with io.open(str(self.fspath), encoding=_ENC) as f:
             markdown = f.read()
         return markdown2html(markdown)
     
