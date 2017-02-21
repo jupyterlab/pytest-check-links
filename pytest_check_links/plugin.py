@@ -185,15 +185,15 @@ class LinkItem(pytest.Item):
 def extensions_str(extensions):
     if not extensions:
         return ''
-    extensions = [e.lstrip('.') for e in extensions if e]
+    extensions = ['"%s"' % e.lstrip('.') for e in extensions if e]
     if len(extensions) == 1:
         return extensions[0]
     return (", ".join(extensions[:-1]) +
-            ", and %s" % extensions[-1])
+            " and %s" % extensions[-1])
 
 
 def validate_extensions(extensions, warn):
     invalid = set(extensions) - supported_extensions
     if invalid:
         warn("C1", "Unsupported extensions for check-links: %s" %
-            ', '.join([e.lstrip('.') for e in invalid]))
+            extensions_str(invalid))
