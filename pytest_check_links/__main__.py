@@ -1,5 +1,5 @@
 """
-This script will run pytest with our plugin loaded and enabled,
+This script will run pytest with our plugin enabled,
 and with the normal python plugin disabled. This means collection
 of normal tests will be disabled, unless other plugins are set
 to collect further tests. If that is the case, you can disable
@@ -16,10 +16,9 @@ def main(args=None):
         args = sys.argv[1:]
 
     return pytest.main(args + [
-        '--check-links'
+        '--check-links',
     ], [
-        'no:python'
-        '.plugin'
+        'no:python',
     ])
 
 
