@@ -6,18 +6,35 @@ from six.moves.urllib.parse import unquote
 import html5lib
 import pytest
 
+from .args import StoreExtensionsAction
+
 _ENC = 'utf8'
+
+default_extensions = {'.md', '.html', '.ipynb'}
+supported_extensions = {'.md', '.html', '.ipynb'}
+
 
 def pytest_addoption(parser):
     group = parser.getgroup("general")
     group.addoption('--check-links', action='store_true',
         help="Check links for validity")
+    group.addoption('--links-ext', action=StoreExtensionsAction,
+        default=default_extensions,
+        help="Which file extensions to check links for, "
+             "as a comma-separated list of values. Supported "
+             "extensions are: %s." %
+                extensions_str(supported_extensions))
+
+
+def pytest_configure(config):
+    if config.option.links_ext:
+        validate_extensions(config.option.links_ext, config.warn)
 
 
 def pytest_collect_file(path, parent):
     config = parent.config
     if config.option.check_links:
-        if path.ext.lower() in {'.md', '.html', '.ipynb'}:
+        if path.ext.lower() in config.option.links_ext:
             return CheckLinks(path, parent)
 
 
@@ -163,3 +180,20 @@ class LinkItem(pytest.Item):
             target_path = self.fspath.dirpath().join(url_path)
             if not target_path.exists():
                 raise BrokenLinkError(self.target, "No such file: %s" % target_path)
+
+
+def extensions_str(extensions):
+    if not extensions:
+        return ''
+    extensions = ['"%s"' % e.lstrip('.') for e in extensions if e]
+    if len(extensions) == 1:
+        return extensions[0]
+    return (", ".join(extensions[:-1]) +
+            " and %s" % extensions[-1])
+
+
+def validate_extensions(extensions, warn):
+    invalid = set(extensions) - supported_extensions
+    if invalid:
+        warn("C1", "Unsupported extensions for check-links: %s" %
+            extensions_str(invalid))
