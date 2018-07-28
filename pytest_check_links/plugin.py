@@ -186,15 +186,16 @@ class LinkItem(pytest.Item):
                 url = url.split('#')[0]
 
             url_path = unquote(url).replace('/', os.path.sep)
+            dirpath = self.fspath.dirpath()
             exists = False
             for ext in supported_extensions:
                 rel_path = url_path.replace('.html', ext)
-                target_path = self.fspath.dirpath().join(rel_path)
+                target_path = dirpath.join(rel_path)
                 if target_path.exists():
                     exists = True
                     break
             if not exists:
-                target_path = self.fspath.dirpath().join(url_path)
+                target_path = dirpath.join(url_path)
                 raise BrokenLinkError(self.target, "No such file: %s" % target_path)
 
 
