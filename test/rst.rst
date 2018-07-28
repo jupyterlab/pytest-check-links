@@ -1,5 +1,5 @@
-Markdown file
-=============
+Restructured Text file
+======================
 
 `I’m an inline-style link <https://www.google.com>`__
 
