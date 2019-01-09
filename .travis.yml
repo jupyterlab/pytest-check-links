@@ -9,9 +9,9 @@ python:
 before_install:
   - pip install --upgrade setuptools pip
 install:
-  - pip install --upgrade .
+  - pip install --upgrade . pytest-cov
 script:
-  - pytest
+  - pytest --cov pytest_check_links
 after_success:
   - pip install codecov
   - codecov
