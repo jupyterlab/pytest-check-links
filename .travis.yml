@@ -1,0 +1,17 @@
+language: python
+dist: xenial
+python:
+  - 3.7
+  - 3.6
+  - 3.5
+  - 3.4
+  - 2.7
+before_install:
+  - pip install --upgrade setuptools pip
+install:
+  - pip install --upgrade .
+script:
+  - pytest
+after_success:
+  - pip install codecov
+  - codecov
