@@ -1,6 +1,7 @@
 from docutils.core import publish_parts
 import io
 import os
+import warnings
 from six.moves.urllib.request import urlopen, Request
 from six.moves.urllib.parse import unquote
 
@@ -29,7 +30,7 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     if config.option.links_ext:
-        validate_extensions(config.option.links_ext, config.warn)
+        validate_extensions(config.option.links_ext)
 
 
 def pytest_collect_file(path, parent):
@@ -209,8 +210,8 @@ def extensions_str(extensions):
             " and %s" % extensions[-1])
 
 
-def validate_extensions(extensions, warn):
+def validate_extensions(extensions):
     invalid = set(extensions) - supported_extensions
     if invalid:
-        warn("C1", "Unsupported extensions for check-links: %s" %
+        warnings.warn("C1", "Unsupported extensions for check-links: %s" %
             extensions_str(invalid))
