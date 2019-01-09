@@ -1,3 +1,4 @@
+from docutils.core import publish_parts
 import io
 import os
 from six.moves.urllib.request import urlopen, Request
@@ -10,8 +11,8 @@ from .args import StoreExtensionsAction
 
 _ENC = 'utf8'
 
-default_extensions = {'.md', '.html', '.ipynb'}
-supported_extensions = {'.md', '.html', '.ipynb'}
+default_extensions = {'.md', '.rst', '.html', '.ipynb'}
+supported_extensions = {'.md', '.rst', '.html', '.ipynb'}
 
 
 def pytest_addoption(parser):
@@ -44,7 +45,7 @@ class CheckLinks(pytest.File):
         """Return HTML from an HTML file"""
         with io.open(str(self.fspath), encoding=_ENC) as f:
             return f.read()
-    
+
     def _html_from_markdown(self):
         """Return HTML from a markdown file"""
         # FIXME: use commonmark or a pluggable engine
@@ -52,7 +53,13 @@ class CheckLinks(pytest.File):
         with io.open(str(self.fspath), encoding=_ENC) as f:
             markdown = f.read()
         return markdown2html(markdown)
-    
+
+    def _html_from_rst(self):
+        """Return HTML from an rst file"""
+        with io.open(str(self.fspath), encoding=_ENC) as f:
+            rst = f.read()
+        return publish_parts(rst, writer_name='html')['html_body']
+
     def _items_from_notebook(self):
         """Yield LinkItems from a notebook"""
         import nbformat
@@ -62,7 +69,7 @@ class CheckLinks(pytest.File):
         for cell_num, cell in enumerate(nb.cells):
             if cell.cell_type != 'markdown':
                 continue
-            
+
             html = markdown2html(cell.source)
             basename = 'Cell %i' % cell_num
             for item in links_in_html(basename, self, html):
@@ -79,6 +86,8 @@ class CheckLinks(pytest.File):
             html = self._html_from_html()
         elif path.ext == '.md':
             html = self._html_from_markdown()
+        elif path.ext == '.rst':
+            html = self._html_from_rst()
 
         for item in links_in_html(path, self, html):
             yield item
@@ -97,7 +106,7 @@ class BrokenLinkError(Exception):
 
 def links_in_html(base_name, parent, html):
     """Yield LinkItems from a markdown cell
-    
+
     Parsed HTML with html5lib, yielding LinkItems for testing.
     """
     parsed = html5lib.parse(html, namespaceHTMLElements=False)
@@ -177,8 +186,16 @@ class LinkItem(pytest.Item):
                 url = url.split('#')[0]
 
             url_path = unquote(url).replace('/', os.path.sep)
-            target_path = self.fspath.dirpath().join(url_path)
-            if not target_path.exists():
+            dirpath = self.fspath.dirpath()
+            exists = False
+            for ext in supported_extensions:
+                rel_path = url_path.replace('.html', ext)
+                target_path = dirpath.join(rel_path)
+                if target_path.exists():
+                    exists = True
+                    break
+            if not exists:
+                target_path = dirpath.join(url_path)
                 raise BrokenLinkError(self.target, "No such file: %s" % target_path)
 
 
