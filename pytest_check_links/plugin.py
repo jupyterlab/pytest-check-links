@@ -1,6 +1,7 @@
 from docutils.core import publish_parts
 import io
 import os
+import time
 import warnings
 from six.moves.urllib.request import urlopen, Request
 from six.moves.urllib.parse import unquote
@@ -150,6 +151,7 @@ class LinkItem(pytest.Item):
     def __init__(self, name, parent, target, description=''):
         super(LinkItem, self).__init__(name, parent)
         self.target = target
+        self.retry_attempts = 0
         self.description = description or '{}: {}'.format(self.fspath, target)
 
     def repr_failure(self, excinfo):
@@ -162,6 +164,25 @@ class LinkItem(pytest.Item):
     def reportinfo(self):
         return self.fspath, 0, self.description
 
+    def handle_retry(self, obj):
+        """Handle responses with a Retry-After header.
+
+        https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.37
+        """
+        if self.retry_attempts < 3 and 'Retry-After' in obj.headers:
+            try:
+                sleep_time = int(obj.headers['Retry-After'])
+            except ValueError:
+                sleep_time = 10
+            # Github uses this non-conforming Retry-After
+            if obj.headers['Retry-After'] == '1m0s':
+                sleep_time = 60
+            self.retry_attempts += 1
+            time.sleep(sleep_time)
+            return self.runtest()
+
+        raise BrokenLinkError(self.target, "%s %s" % (obj.code, obj.reason))
+
     def runtest(self):
         if ':' in self.target:
             # external reference, download
@@ -170,11 +191,15 @@ class LinkItem(pytest.Item):
             try:
                 f = urlopen(req)
             except Exception as e:
+                if hasattr(e, 'headers') and 'Retry-After' in e.headers:
+                    return self.handle_retry(e)
                 raise BrokenLinkError(self.target, str(e))
             else:
                 code = f.getcode()
                 f.close()
                 if code >= 400:
+                    if 'Retry-After' in f.headers:
+                        return self.handle_retry(e)
                     raise BrokenLinkError(self.target, str(code))
         else:
             if self.target.startswith('/'):
