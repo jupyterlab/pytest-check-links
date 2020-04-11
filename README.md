@@ -5,6 +5,7 @@ pytest plugin that checks URLs for HTML-containing files.
 Supported files:
 
 - .html
+- .rst
 - .md (TODO: select renderer)
 - .ipynb (requires nbconvert)
 
