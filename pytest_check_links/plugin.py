@@ -21,6 +21,8 @@ def pytest_addoption(parser):
     group = parser.getgroup("general")
     group.addoption('--check-links', action='store_true',
         help="Check links for validity")
+    group.addoption('--check-anchors', action='store_true',
+        help="Check link anchors for validity")
     group.addoption('--links-ext', action=StoreExtensionsAction,
         default=default_extensions,
         help="Which file extensions to check links for, "
@@ -38,11 +40,15 @@ def pytest_collect_file(path, parent):
     config = parent.config
     if config.option.check_links:
         if path.ext.lower() in config.option.links_ext:
-            return CheckLinks(path, parent)
+            return CheckLinks(path, parent, config.option.check_anchors)
 
 
 class CheckLinks(pytest.File):
     """Check the links in a file"""
+    def __init__(self, path, parent, check_anchors):
+        super(CheckLinks, self).__init__(path, parent)
+        self.check_anchors = check_anchors
+
     def _html_from_html(self):
         """Return HTML from an HTML file"""
         with io.open(str(self.fspath), encoding=_ENC) as f:
@@ -119,9 +125,10 @@ def links_in_html(base_name, parent, html):
         if tag == 'a':
             attr = 'href'
             url = element.get('href', '')
-            if url.startswith('#'):
+            if url.startswith('#') and not parent.check_anchors:
                 # skip internal links
                 continue
+
         elif tag in {'img', 'iframe'}:
             attr = 'src'
         else:
@@ -136,7 +143,7 @@ def links_in_html(base_name, parent, html):
                 if proto.lower() not in {'http', 'https'}:
                     # ignore non-http links (mailto:, data:, etc.)
                     continue
-            yield LinkItem(name, parent, url)
+            yield LinkItem(name, parent, url, parsed)
 
 
 class LinkItem(pytest.Item):
@@ -146,12 +153,14 @@ class LinkItem(pytest.Item):
 
         name, parent: inherited from pytest.Item
         target (str): The URL or path target for the link
+        parsed (xml.etree.ElementTree.Element): The parsed HTML
         description (str, optional): The description to be used in the report header
     """
-    def __init__(self, name, parent, target, description=''):
+    def __init__(self, name, parent, target, parsed, description=''):
         super(LinkItem, self).__init__(name, parent)
         self.target = target
         self.retry_attempts = 0
+        self.parsed = parsed
         self.description = description or '{}: {}'.format(self.fspath, target)
 
     def repr_failure(self, excinfo):
@@ -183,6 +192,20 @@ class LinkItem(pytest.Item):
 
         raise BrokenLinkError(self.target, "%s %s" % (obj.code, obj.reason))
 
+    def handle_anchor(self, parsed, anchor):
+        anchors = parsed.findall('*//a[@name="{}"]'.format(anchor))
+
+        if not anchors:
+            raise BrokenLinkError(self.target, "Missing anchor: %s" % anchor)
+
+        if len(anchors) > 1:
+            raise BrokenLinkError(
+                self.target,
+                "Ambiguous anchor: %d (found %s)" % (
+                    len(anchors), anchor
+                )
+            )
+
     def runtest(self):
         if ':' in self.target:
             # external reference, download
@@ -206,10 +229,16 @@ class LinkItem(pytest.Item):
                 raise BrokenLinkError(self.target, "absolute path link")
             # relative URL
             url = self.target
+            anchor = None
             if '?' in url:
                 url = url.split('?')[0]
             if '#' in url:
-                url = url.split('#')[0]
+                url, anchor = url.split('#')
+
+            if not url and anchor:
+                if self.parent.check_anchors:
+                    self.handle_anchor(self.parsed, anchor)
+                return
 
             url_path = unquote(url).replace('/', os.path.sep)
             dirpath = self.fspath.dirpath()
@@ -219,6 +248,11 @@ class LinkItem(pytest.Item):
                 target_path = dirpath.join(rel_path)
                 if target_path.exists():
                     exists = True
+                    # only check anchors in html for now
+                    if ext == ".html" and anchor and self.parent.check_anchors:
+                        with target_path.open() as fpt:
+                            parsed = html5lib.parse(fpt, namespaceHTMLElements=False)
+                            return self.handle_anchor(parsed, anchor)
                     break
             if not exists:
                 target_path = dirpath.join(url_path)
