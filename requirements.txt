@@ -1,6 +1,6 @@
-pytest >= 2.8
-html5lib
-six
-nbformat
-nbconvert
 docutils
+html5lib
+nbconvert
+nbformat
+pytest >= 2.8
+requests

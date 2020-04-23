@@ -3,11 +3,10 @@ import io
 import os
 import time
 import warnings
-from six.moves.urllib.request import urlopen, Request
-from six.moves.urllib.parse import unquote
 
 import html5lib
 import pytest
+import requests
 
 from .args import StoreExtensionsAction
 
@@ -48,6 +47,8 @@ class CheckLinks(pytest.File):
     def __init__(self, path, parent, check_anchors):
         super(CheckLinks, self).__init__(path, parent)
         self.check_anchors = check_anchors
+        self.requests_session = requests.Session()
+        self.requests_session.headers['User-Agent'] = 'pytest-check-links'
 
     def _html_from_html(self):
         """Return HTML from an HTML file"""
@@ -159,7 +160,6 @@ class LinkItem(pytest.Item):
     def __init__(self, name, parent, target, parsed, description=''):
         super(LinkItem, self).__init__(name, parent)
         self.target = target
-        self.retry_attempts = 0
         self.parsed = parsed
         self.description = description or '{}: {}'.format(self.fspath, target)
 
@@ -173,26 +173,31 @@ class LinkItem(pytest.Item):
     def reportinfo(self):
         return self.fspath, 0, self.description
 
-    def handle_retry(self, obj):
+    def sleep(self, response):
         """Handle responses with a Retry-After header.
 
         https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.37
         """
-        if self.retry_attempts < 3:
+        header = response.headers.get('Retry-After')
+
+        if header is None:
+            return False
+
+        if header == '1m0s':
+            sleep_time = 60
+        else:
             try:
-                sleep_time = int(obj.headers['Retry-After'])
+                sleep_time = int(sleep_time)
             except ValueError:
                 sleep_time = 10
-            # Github uses this non-conforming Retry-After
-            if obj.headers['Retry-After'] == '1m0s':
-                sleep_time = 60
-            self.retry_attempts += 1
-            time.sleep(sleep_time)
-            return self.runtest()
 
-        raise BrokenLinkError(self.target, "%s %s" % (obj.code, obj.reason))
+        time.sleep(sleep_time)
+
+        return True
 
     def handle_anchor(self, parsed, anchor):
+        """Verify an anchor exists in the parsed HTML
+        """
         anchors = parsed.findall('*//a[@name="{}"]'.format(anchor))
 
         if not anchors:
@@ -206,24 +211,23 @@ class LinkItem(pytest.Item):
                 )
             )
 
+    def fetch_with_retries(self, url, retries=3):
+        """Fetch a URL, optionally retrying after a delay (by header)
+        """
+        response = self.parent.requests_session.get(url)
+
+        if response.status_code >= 400:
+            if retries and self.sleep(response):
+                return self.fetch_with_retries(url, retries=retries - 1)
+
+            raise BrokenLinkError(url, "%d: %s" % (
+                response.status_code,
+                response.reason
+            ))
+
     def runtest(self):
         if ':' in self.target:
-            # external reference, download
-            req = Request(self.target)
-            req.add_header('User-Agent', 'pytest-check-links')
-            try:
-                f = urlopen(req)
-            except Exception as e:
-                if hasattr(e, 'headers') and 'Retry-After' in e.headers:
-                    return self.handle_retry(e)
-                raise BrokenLinkError(self.target, str(e))
-            else:
-                code = f.getcode()
-                f.close()
-                if code >= 400:
-                    if 'Retry-After' in f.headers:
-                        return self.handle_retry(e)
-                    raise BrokenLinkError(self.target, str(code))
+            return self.fetch_with_retries(self.target)
         else:
             if self.target.startswith('/'):
                 raise BrokenLinkError(self.target, "absolute path link")
@@ -240,7 +244,7 @@ class LinkItem(pytest.Item):
                     self.handle_anchor(self.parsed, anchor)
                 return
 
-            url_path = unquote(url).replace('/', os.path.sep)
+            url_path = requests.compat.unquote(url).replace('/', os.path.sep)
             dirpath = self.fspath.dirpath()
             exists = False
             for ext in supported_extensions:
