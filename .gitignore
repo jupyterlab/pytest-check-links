@@ -82,6 +82,7 @@ celerybeat-schedule
 # virtualenv
 venv/
 ENV/
+envs/
 
 # Spyder project settings
 .spyderproject
@@ -92,3 +93,6 @@ ENV/
 # pbr-generated files
 AUTHORS
 ChangeLog
+
+# caches
+*.sqlite

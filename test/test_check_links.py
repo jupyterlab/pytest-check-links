@@ -1,4 +1,5 @@
 import os
+import time
 
 here = os.path.dirname(os.path.abspath(__file__))
 examples = os.path.join(os.path.dirname(here), 'examples')
@@ -36,3 +37,30 @@ def test_anchors_other(testdir):
     testdir.copy_example('anchors_other.html')
     result = testdir.runpytest("-v", "--check-links", "--check-anchors", "anchors_other.html")
     result.assert_outcomes(passed=1, failed=2)
+
+def test_cache_expiry(testdir):
+    testdir.copy_example('linkcheck.ipynb')
+
+    args = ["-v", "--check-links", "--check-links-cache",
+            "--check-links-cache-expire-after", "2"]
+    expected = dict(passed=3, failed=3)
+    t0 = time.time()
+    result = testdir.runpytest(*args)
+    t1 = time.time()
+    result.assert_outcomes(**expected)
+
+    t2 = time.time()
+    result = testdir.runpytest(*args)
+    t3 = time.time()
+    result.assert_outcomes(**expected)
+
+    assert t1 - t0 > t3 - t2, "cache did not make second run faster"
+
+    time.sleep(2)
+
+    t4 = time.time()
+    result = testdir.runpytest(*args)
+    t5 = time.time()
+    result.assert_outcomes(**expected)
+
+    assert t5 - t4 > t3 - t2, "cache did not expire"

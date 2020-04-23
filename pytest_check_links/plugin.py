@@ -8,12 +8,19 @@ import html5lib
 import pytest
 import requests
 
-from .args import StoreExtensionsAction
+from .args import StoreExtensionsAction, StoreCacheAction
 
 _ENC = 'utf8'
 
 default_extensions = {'.md', '.rst', '.html', '.ipynb'}
 supported_extensions = {'.md', '.rst', '.html', '.ipynb'}
+
+default_cache = dict(
+    cache_name='.pytest-check-links-cache',
+    backend=None,
+    expire_after=None,
+    allowable_codes=list(range(200, 512)),
+)
 
 
 def pytest_addoption(parser):
@@ -29,26 +36,51 @@ def pytest_addoption(parser):
              "extensions are: %s." %
                 extensions_str(supported_extensions))
 
+    group.addoption('--check-links-cache', action='store_true',
+        help="Cache requests when checking links")
+    group.addoption('--check-links-cache-name', action=StoreCacheAction,
+        default="pytest-check-links", help="Name of link cache")
+    group.addoption('--check-links-cache-backend', action=StoreCacheAction,
+        default=None, help="Cache persistence backend")
+    group.addoption('--check-links-cache-expire-after', action=StoreCacheAction,
+        default=300, help="Time to cache link responses (seconds)")
+    group.addoption('--check-links-cache-allowable-codes', action=StoreCacheAction,
+        default=[200, 404], help="HTTP response codes to cache")
+    group.addoption('--check-links-cache-backend-opt', action=StoreCacheAction,
+        default=[200, 404], help="Backend-specific options for link cache")
+
 
 def pytest_configure(config):
     if config.option.links_ext:
         validate_extensions(config.option.links_ext)
 
-
 def pytest_collect_file(path, parent):
     config = parent.config
     if config.option.check_links:
+        cache_kwargs = None
+        if config.option.check_links_cache:
+            cache_kwargs = getattr(config.option, "check_links_cache_kwargs", {})
         if path.ext.lower() in config.option.links_ext:
-            return CheckLinks(path, parent, config.option.check_anchors)
+            return CheckLinks(path, parent, config.option.check_anchors, cache_kwargs)
 
 
 class CheckLinks(pytest.File):
     """Check the links in a file"""
-    def __init__(self, path, parent, check_anchors):
+    def __init__(self, path, parent, check_anchors=False, cache_kwargs=None):
         super(CheckLinks, self).__init__(path, parent)
         self.check_anchors = check_anchors
-        self.requests_session = requests.Session()
-        self.requests_session.headers['User-Agent'] = 'pytest-check-links'
+        if cache_kwargs is not None:
+            from requests_cache import CachedSession
+            final_cache_kwargs = dict(default_cache)
+            final_cache_kwargs.update(cache_kwargs)
+            session = CachedSession(**final_cache_kwargs)
+            if final_cache_kwargs.get("expire_after"):
+                session.remove_expired_responses()
+        else:
+            session = requests.Session()
+
+        session.headers['User-Agent'] = 'pytest-check-links'
+        self.requests_session = session
 
     def _html_from_html(self):
         """Return HTML from an HTML file"""

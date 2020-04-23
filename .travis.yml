@@ -1,15 +1,15 @@
 language: python
 dist: xenial
 python:
+  - 3.8
   - 3.7
   - 3.6
   - 3.5
-  - 3.4
   - 2.7
 before_install:
   - pip install --upgrade setuptools pip
 install:
-  - pip install --upgrade . pytest-cov
+  - pip install --upgrade .[cache] pytest-cov
 script:
   - pytest --cov pytest_check_links
 after_success:
