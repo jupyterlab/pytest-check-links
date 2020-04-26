@@ -246,7 +246,11 @@ class LinkItem(pytest.Item):
     def fetch_with_retries(self, url, retries=3):
         """Fetch a URL, optionally retrying after a delay (by header)
         """
-        response = self.parent.requests_session.get(url)
+
+        try:
+            response = self.parent.requests_session.get(url)
+        except Exception as err:
+            raise BrokenLinkError(url, "%s" % err)
 
         if response.status_code >= 400:
             if retries and self.sleep(response):
