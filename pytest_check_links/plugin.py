@@ -39,15 +39,15 @@ def pytest_addoption(parser):
     group.addoption('--check-links-cache', action='store_true',
         help="Cache requests when checking links")
     group.addoption('--check-links-cache-name', action=StoreCacheAction,
-        default="pytest-check-links", help="Name of link cache")
+        help="Name of link cache")
     group.addoption('--check-links-cache-backend', action=StoreCacheAction,
-        default=None, help="Cache persistence backend")
+        help="Cache persistence backend")
     group.addoption('--check-links-cache-expire-after', action=StoreCacheAction,
-        default=300, help="Time to cache link responses (seconds)")
+        help="Time to cache link responses (seconds)")
     group.addoption('--check-links-cache-allowable-codes', action=StoreCacheAction,
-        default=[200, 404], help="HTTP response codes to cache")
+        help="HTTP response codes to cache")
     group.addoption('--check-links-cache-backend-opt', action=StoreCacheAction,
-        default=[200, 404], help="Backend-specific options for link cache")
+        help="Backend-specific options for link cache, specfied as `opt:value`")
 
 
 def pytest_configure(config):

@@ -32,5 +32,7 @@ class StoreCacheAction(argparse.Action):
         elif dest == "backend_opt":
             key, value = values.split(":", 1)
             kwargs[key] = value
+        elif dest == "allowable_codes":
+            kwargs[key] = list(map(int, value.split(",")))
         else:
             kwargs[dest] = values
