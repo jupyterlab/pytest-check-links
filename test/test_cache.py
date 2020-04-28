@@ -14,27 +14,37 @@ def base_args():
     return ["-v", "--check-links", "--check-links-cache"]
 
 
-def assert_sqlite(testdir, name=".pytest-check-links-cache.sqlite", exists=True):
-    caches = list(glob(os.path.join(testdir.tmpdir, name)))
+def assert_sqlite(testdir, name=None, tmpdir=None, exists=True):
+    name = name or ".pytest-check-links-cache.sqlite"
+    tmpdir = str(tmpdir or testdir.tmpdir)
+    caches = list(glob(os.path.join(tmpdir, name)))
     if exists:
         assert caches
     else:
         assert not caches
 
-
-def test_cache_expiry(testdir, base_args):
+@pytest.mark.parametrize("cache_name", [
+    None,
+    "custom-cache"
+])
+def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
     """will the default sqlite3 backend persist and then expire?
     """
     testdir.copy_example('linkcheck.ipynb')
 
     args = [*base_args, "--check-links-cache-expire-after", "2"]
+    if cache_name:
+        args += ["--check-links-cache-name", os.path.join(str(tmpdir), cache_name)]
     expected = dict(passed=3, failed=3)
     t0 = time.time()
     result = testdir.runpytest(*args)
     t1 = time.time()
     result.assert_outcomes(**expected)
 
-    assert_sqlite(testdir)
+    if cache_name:
+        assert_sqlite(testdir, name="{}.sqlite".format(cache_name), tmpdir=tmpdir)
+    else:
+        assert_sqlite(testdir)
 
     t2 = time.time()
     result = testdir.runpytest(*args)
