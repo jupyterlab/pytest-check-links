@@ -54,33 +54,45 @@ def pytest_configure(config):
     if config.option.links_ext:
         validate_extensions(config.option.links_ext)
 
+
 def pytest_collect_file(path, parent):
     config = parent.config
     if config.option.check_links:
-        cache_kwargs = None
-        if config.option.check_links_cache:
-            cache_kwargs = getattr(config.option, "check_links_cache_kwargs", {})
+        requests_session = ensure_requests_session(config)
         if path.ext.lower() in config.option.links_ext:
-            return CheckLinks(path, parent, config.option.check_anchors, cache_kwargs)
+            return CheckLinks(path, parent, requests_session, config.option.check_anchors)
+
+
+def ensure_requests_session(config):
+    """Build the singleton requests.Session (or subclass)
+    """
+    session_attr = "check_links_requests_session"
+
+    if not hasattr(config.option, session_attr):
+        if config.option.check_links_cache:
+            from requests_cache import CachedSession
+            conf_kwargs = getattr(config.option, "check_links_cache_kwargs", {})
+            kwargs = dict(default_cache)
+            kwargs.update(conf_kwargs)
+            requests_session = CachedSession(**kwargs)
+            if kwargs.get("expire_after"):
+                requests_session.remove_expired_responses()
+        else:
+            requests_session = requests.Session()
+
+        requests_session.headers['User-Agent'] = 'pytest-check-links'
+
+        setattr(config.option, session_attr, requests_session)
+
+    return getattr(config.option, session_attr)
 
 
 class CheckLinks(pytest.File):
     """Check the links in a file"""
-    def __init__(self, path, parent, check_anchors=False, cache_kwargs=None):
+    def __init__(self, path, parent, requests_session, check_anchors=False):
         super(CheckLinks, self).__init__(path, parent)
         self.check_anchors = check_anchors
-        if cache_kwargs is not None:
-            from requests_cache import CachedSession
-            final_cache_kwargs = dict(default_cache)
-            final_cache_kwargs.update(cache_kwargs)
-            session = CachedSession(**final_cache_kwargs)
-            if final_cache_kwargs.get("expire_after"):
-                session.remove_expired_responses()
-        else:
-            session = requests.Session()
-
-        session.headers['User-Agent'] = 'pytest-check-links'
-        self.requests_session = session
+        self.requests_session = requests_session
 
     def _html_from_html(self):
         """Return HTML from an HTML file"""
@@ -248,7 +260,7 @@ class LinkItem(pytest.Item):
         """
 
         try:
-            response = self.parent.requests_session.get(url)
+            response = self.parent.requests_session.get(url.split("#")[0])
         except Exception as err:
             raise BrokenLinkError(url, "%s" % err)
 
