@@ -33,7 +33,7 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
     """
     testdir.copy_example('linkcheck.ipynb')
 
-    args = [*base_args, "--check-links-cache-expire-after", "2"]
+    args = base_args + ["--check-links-cache-expire-after", "2"]
     if cache_name:
         args += ["--check-links-cache-name", os.path.join(str(tmpdir), cache_name)]
     expected = dict(passed=3, failed=3)
@@ -67,7 +67,7 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
 def test_cache_memory(testdir, base_args):
     """will the memory backend cache links inside a run?
     """
-    args = [*base_args, "--check-links-cache-backend", "memory"]
+    args = base_args + ["--check-links-cache-backend", "memory"]
     expected = dict(passed=3, failed=0)
 
     testdir.copy_example('httpbin.md')
