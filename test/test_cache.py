@@ -23,6 +23,7 @@ def assert_sqlite(testdir, name=None, tmpdir=None, exists=True):
     else:
         assert not caches
 
+
 @pytest.mark.parametrize("cache_name", [
     None,
     "custom-cache"
@@ -61,7 +62,6 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
     result.assert_outcomes(**expected)
 
     assert t5 - t4 > t3 - t2, "cache did not expire"
-
 
 
 def test_cache_memory(testdir, base_args):
