@@ -84,8 +84,8 @@ def test_cache_memory(testdir, base_args):
 
     for i in range(5):
         shutil.copy(
-            os.path.join(testdir.tmpdir, "httpbin.md"),
-            os.path.join(testdir.tmpdir, "httpbin{}.md".format(i))
+            os.path.join(str(testdir.tmpdir), "httpbin.md"),
+            os.path.join(str(testdir.tmpdir), "httpbin{}.md".format(i))
         )
 
     d1 = run(36)
