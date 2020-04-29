@@ -17,7 +17,8 @@ def test_anchors_local_self(testdir, anchor_args):
 def test_anchors_local_other(testdir, anchor_args):
     testdir.copy_example('anchors_self.html')
     testdir.copy_example('anchors_other.html')
-    result = testdir.runpytest(*anchor_args, "anchors_other.html")
+    args = anchor_args + ["anchors_other.html"]
+    result = testdir.runpytest(*args)
     result.assert_outcomes(passed=1, failed=2)
 
 
