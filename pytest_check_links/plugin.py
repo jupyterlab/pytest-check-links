@@ -6,7 +6,8 @@ import warnings
 
 import html5lib
 import pytest
-import requests
+from requests import Session, Request
+from requests.compat import unquote
 
 from .args import StoreExtensionsAction, StoreCacheAction
 
@@ -78,7 +79,7 @@ def ensure_requests_session(config):
             if kwargs.get("expire_after"):
                 requests_session.remove_expired_responses()
         else:
-            requests_session = requests.Session()
+            requests_session = Session()
 
         requests_session.headers['User-Agent'] = 'pytest-check-links'
 
@@ -231,7 +232,7 @@ class LinkItem(pytest.Item):
             sleep_time = 60
         else:
             try:
-                sleep_time = int(sleep_time)
+                sleep_time = int(header)
             except ValueError:
                 sleep_time = 10
 
@@ -259,19 +260,34 @@ class LinkItem(pytest.Item):
         """Fetch a URL, optionally retrying after a delay (by header)
         """
 
+        url_no_anchor = url.split("#")[0]
+        session = self.parent.requests_session
+
         try:
-            response = self.parent.requests_session.get(url.split("#")[0])
+            response = session.get(url_no_anchor)
         except Exception as err:
             raise BrokenLinkError(url, "%s" % err)
 
         if response.status_code >= 400:
             if retries and self.sleep(response):
+                self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
 
             raise BrokenLinkError(url, "%d: %s" % (
                 response.status_code,
                 response.reason
             ))
+
+    def uncache_url(self, url):
+        uncached = False
+        session = self.parent.requests_session
+        if hasattr(session, "cache"):
+            request = Request('GET', url, headers=session.headers).prepare()
+            key = session.cache.create_key(request)
+            if session.cache.has_key(key):
+                session.cache.delete(key)
+                uncached = True
+        return uncached
 
     def runtest(self):
         if ':' in self.target:
@@ -292,7 +308,7 @@ class LinkItem(pytest.Item):
                     self.handle_anchor(self.parsed, anchor)
                 return
 
-            url_path = requests.compat.unquote(url).replace('/', os.path.sep)
+            url_path = unquote(url).replace('/', os.path.sep)
             dirpath = self.fspath.dirpath()
             exists = False
             for ext in supported_extensions:
