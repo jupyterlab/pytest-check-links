@@ -278,6 +278,8 @@ class LinkItem(pytest.Item):
                 response.reason
             ))
 
+        return response
+
     def uncache_url(self, url):
         uncached = False
         session = self.parent.requests_session
@@ -290,13 +292,19 @@ class LinkItem(pytest.Item):
         return uncached
 
     def runtest(self):
-        if ':' in self.target:
-            return self.fetch_with_retries(self.target)
+        url = self.target
+
+        if ':' in url:
+            response = self.fetch_with_retries(url)
+            if self.parent.check_anchors and '#' in url:
+                anchor = url.split('#')[1]
+                if anchor and "html" in response.headers.get("Content-Type"):
+                    parsed = html5lib.parse(response.content, namespaceHTMLElements=False)
+                    return self.handle_anchor(parsed, anchor)
         else:
-            if self.target.startswith('/'):
-                raise BrokenLinkError(self.target, "absolute path link")
+            if url.startswith('/'):
+                raise BrokenLinkError(url, "absolute path link")
             # relative URL
-            url = self.target
             anchor = None
             if '?' in url:
                 url = url.split('?')[0]
@@ -324,7 +332,7 @@ class LinkItem(pytest.Item):
                     break
             if not exists:
                 target_path = dirpath.join(url_path)
-                raise BrokenLinkError(self.target, "No such file: %s" % target_path)
+                raise BrokenLinkError(url, "No such file: %s" % target_path)
 
 
 def extensions_str(extensions):

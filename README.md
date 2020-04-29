@@ -27,8 +27,9 @@ A comma-separated list of extensions to check
 
 #### --check-anchors
 
-Also check whether links with `#fragments` to local HTML files actually exist,
-and point to exactly one named anchor.
+Also check whether links with `#anchors` HTML files (either local, or with
+served with `html` in the `Content-Type`) actually exist, and point to _exactly one_
+named anchor.
 
 ### Cache
 
