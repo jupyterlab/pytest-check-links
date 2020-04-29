@@ -1,5 +1,5 @@
 import argparse
-
+import json
 
 class StoreExtensionsAction(argparse.Action):
 
@@ -30,9 +30,10 @@ class StoreCacheAction(argparse.Action):
         elif dest == "expire_after":
             kwargs["expire_after"] = float(values)
         elif dest == "backend_opt":
-            key, value = values.split(":", 1)
-            kwargs[key] = value
-        elif dest == "allowable_codes":
-            kwargs[key] = list(map(int, value.split(",")))
+            key, value = str(values).split(":", 1)
+            try:
+                kwargs[key] = json.loads(value)
+            except:
+                kwargs[key] = value
         else:
             kwargs[dest] = values

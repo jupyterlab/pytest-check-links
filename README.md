@@ -69,17 +69,18 @@ for more information.
 
 Time to cache link responses (seconds).
 
-#### --check-links-cache-allowable-codes
-
-HTTP responses to cache. As opposed to the default `requests-cache` behavior
-of caching only `200` responses, _all_ responses will be cached, to avoid repeatedly
-requesting broken links.
-
 #### --check-links-cache-backend-opt
 
 Backend-specific options for link cache, provided as `key:value`. These are passed
 directly to the `requests_cache.CachedSession` constructor, as they vary depending
 on the backend.
+
+Values will be parsed as JSON first, so to overload the default of caching all
+HTTP response codes (which requires a list of `int`s):
+
+```bash
+--check-links-backend-opt allowable_codes:[200]
+```
 
 
 ## TODO
