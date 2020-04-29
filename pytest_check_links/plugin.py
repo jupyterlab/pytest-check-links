@@ -3,18 +3,25 @@ import io
 import os
 import time
 import warnings
-from six.moves.urllib.request import urlopen, Request
-from six.moves.urllib.parse import unquote
 
 import html5lib
 import pytest
+from requests import Session, Request
+from requests.compat import unquote
 
-from .args import StoreExtensionsAction
+from .args import StoreExtensionsAction, StoreCacheAction
 
 _ENC = 'utf8'
 
 default_extensions = {'.md', '.rst', '.html', '.ipynb'}
 supported_extensions = {'.md', '.rst', '.html', '.ipynb'}
+
+default_cache = dict(
+    cache_name='.pytest-check-links-cache',
+    backend=None,
+    expire_after=None,
+    allowable_codes=list(range(200, 512)),
+)
 
 
 def pytest_addoption(parser):
@@ -30,6 +37,19 @@ def pytest_addoption(parser):
              "extensions are: %s." %
                 extensions_str(supported_extensions))
 
+    group.addoption('--check-links-cache', action='store_true',
+        help="Cache requests when checking links")
+    group.addoption('--check-links-cache-name', action=StoreCacheAction,
+        help="Name of link cache")
+    group.addoption('--check-links-cache-backend', action=StoreCacheAction,
+        help="Cache persistence backend")
+    group.addoption('--check-links-cache-expire-after', action=StoreCacheAction,
+        help="Time to cache link responses (seconds)")
+    group.addoption('--check-links-cache-allowable-codes', action=StoreCacheAction,
+        help="HTTP response codes to cache")
+    group.addoption('--check-links-cache-backend-opt', action=StoreCacheAction,
+        help="Backend-specific options for link cache, specfied as `opt:value`")
+
 
 def pytest_configure(config):
     if config.option.links_ext:
@@ -39,15 +59,41 @@ def pytest_configure(config):
 def pytest_collect_file(path, parent):
     config = parent.config
     if config.option.check_links:
+        requests_session = ensure_requests_session(config)
         if path.ext.lower() in config.option.links_ext:
-            return CheckLinks(path, parent, config.option.check_anchors)
+            return CheckLinks(path, parent, requests_session, config.option.check_anchors)
+
+
+def ensure_requests_session(config):
+    """Build the singleton requests.Session (or subclass)
+    """
+    session_attr = "check_links_requests_session"
+
+    if not hasattr(config.option, session_attr):
+        if config.option.check_links_cache:
+            from requests_cache import CachedSession
+            conf_kwargs = getattr(config.option, "check_links_cache_kwargs", {})
+            kwargs = dict(default_cache)
+            kwargs.update(conf_kwargs)
+            requests_session = CachedSession(**kwargs)
+            if kwargs.get("expire_after"):
+                requests_session.remove_expired_responses()
+        else:
+            requests_session = Session()
+
+        requests_session.headers['User-Agent'] = 'pytest-check-links'
+
+        setattr(config.option, session_attr, requests_session)
+
+    return getattr(config.option, session_attr)
 
 
 class CheckLinks(pytest.File):
     """Check the links in a file"""
-    def __init__(self, path, parent, check_anchors):
+    def __init__(self, path, parent, requests_session, check_anchors=False):
         super(CheckLinks, self).__init__(path, parent)
         self.check_anchors = check_anchors
+        self.requests_session = requests_session
 
     def _html_from_html(self):
         """Return HTML from an HTML file"""
@@ -159,7 +205,6 @@ class LinkItem(pytest.Item):
     def __init__(self, name, parent, target, parsed, description=''):
         super(LinkItem, self).__init__(name, parent)
         self.target = target
-        self.retry_attempts = 0
         self.parsed = parsed
         self.description = description or '{}: {}'.format(self.fspath, target)
 
@@ -173,26 +218,31 @@ class LinkItem(pytest.Item):
     def reportinfo(self):
         return self.fspath, 0, self.description
 
-    def handle_retry(self, obj):
+    def sleep(self, response):
         """Handle responses with a Retry-After header.
 
         https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.37
         """
-        if self.retry_attempts < 3:
+        header = response.headers.get('Retry-After')
+
+        if header is None:
+            return False
+
+        if header == '1m0s':
+            sleep_time = 60
+        else:
             try:
-                sleep_time = int(obj.headers['Retry-After'])
+                sleep_time = int(header)
             except ValueError:
                 sleep_time = 10
-            # Github uses this non-conforming Retry-After
-            if obj.headers['Retry-After'] == '1m0s':
-                sleep_time = 60
-            self.retry_attempts += 1
-            time.sleep(sleep_time)
-            return self.runtest()
 
-        raise BrokenLinkError(self.target, "%s %s" % (obj.code, obj.reason))
+        time.sleep(sleep_time)
+
+        return True
 
     def handle_anchor(self, parsed, anchor):
+        """Verify an anchor exists in the parsed HTML
+        """
         anchors = parsed.findall('*//a[@name="{}"]'.format(anchor))
 
         if not anchors:
@@ -206,29 +256,55 @@ class LinkItem(pytest.Item):
                 )
             )
 
+    def fetch_with_retries(self, url, retries=3):
+        """Fetch a URL, optionally retrying after a delay (by header)
+        """
+
+        url_no_anchor = url.split("#")[0]
+        session = self.parent.requests_session
+
+        try:
+            response = session.get(url_no_anchor)
+        except Exception as err:
+            raise BrokenLinkError(url, "%s" % err)
+
+        if response.status_code >= 400:
+            if retries and self.sleep(response):
+                self.uncache_url(url_no_anchor)
+                return self.fetch_with_retries(url, retries=retries - 1)
+
+            raise BrokenLinkError(url, "%d: %s" % (
+                response.status_code,
+                response.reason
+            ))
+
+        return response
+
+    def uncache_url(self, url):
+        uncached = False
+        session = self.parent.requests_session
+        if hasattr(session, "cache"):
+            request = Request('GET', url, headers=session.headers).prepare()
+            key = session.cache.create_key(request)
+            if session.cache.has_key(key):
+                session.cache.delete(key)
+                uncached = True
+        return uncached
+
     def runtest(self):
-        if ':' in self.target:
-            # external reference, download
-            req = Request(self.target)
-            req.add_header('User-Agent', 'pytest-check-links')
-            try:
-                f = urlopen(req)
-            except Exception as e:
-                if hasattr(e, 'headers') and 'Retry-After' in e.headers:
-                    return self.handle_retry(e)
-                raise BrokenLinkError(self.target, str(e))
-            else:
-                code = f.getcode()
-                f.close()
-                if code >= 400:
-                    if 'Retry-After' in f.headers:
-                        return self.handle_retry(e)
-                    raise BrokenLinkError(self.target, str(code))
+        url = self.target
+
+        if ':' in url:
+            response = self.fetch_with_retries(url)
+            if self.parent.check_anchors and '#' in url:
+                anchor = url.split('#')[1]
+                if anchor and "html" in response.headers.get("Content-Type"):
+                    parsed = html5lib.parse(response.content, namespaceHTMLElements=False)
+                    return self.handle_anchor(parsed, anchor)
         else:
-            if self.target.startswith('/'):
-                raise BrokenLinkError(self.target, "absolute path link")
+            if url.startswith('/'):
+                raise BrokenLinkError(url, "absolute path link")
             # relative URL
-            url = self.target
             anchor = None
             if '?' in url:
                 url = url.split('?')[0]
@@ -256,7 +332,7 @@ class LinkItem(pytest.Item):
                     break
             if not exists:
                 target_path = dirpath.join(url_path)
-                raise BrokenLinkError(self.target, "No such file: %s" % target_path)
+                raise BrokenLinkError(url, "No such file: %s" % target_path)
 
 
 def extensions_str(extensions):
