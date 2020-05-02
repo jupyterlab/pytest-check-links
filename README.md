@@ -2,6 +2,9 @@
 
 pytest plugin that checks URLs for HTML-containing files.
 
+[![codecov](https://codecov.io/gh/jupyterlab/pytest-check-links/branch/master/graph/badge.svg)](https://codecov.io/gh/jupyterlab/pytest-check-links)
+[![Build Status](https://travis-ci.com/jupyterlab/pytest-check-links.svg?branch=master)](https://travis-ci.com/jupyterlab/pytest-check-links)
+
 ## Supported files
 
 - `.html`
