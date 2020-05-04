@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.4.1
+* Clean up metadata for dist generation [#19](https://github.com/jupyterlab/pytest-check-links/pull/19)
+* Improve retry logic and add python 3 classifier [#18](https://github.com/jupyterlab/pytest-check-links/pull/18)
+
 ## 0.4.0
 * Drop py27 support and add badges [#15](https://github.com/jupyterlab/pytest-check-links/pull/15)
 * Use requests(-cache) [#12](https://github.com/jupyterlab/pytest-check-links/pull/12)
