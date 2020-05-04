@@ -261,19 +261,20 @@ class LinkItem(pytest.Item):
         """
 
         url_no_anchor = url.split("#")[0]
-        self.uncache_url(url_no_anchor)
         session = self.parent.requests_session
 
         try:
             response = session.get(url_no_anchor)
         except Exception as err:
             if hasattr(err, 'response') and retries and self.sleep(err.response):
+                self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
 
             raise BrokenLinkError(url, "%s" % err)
 
         if response.status_code >= 400:
             if retries and self.sleep(response):
+                self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
 
             raise BrokenLinkError(url, "%d: %s" % (

@@ -96,7 +96,7 @@ def test_cache_memory(testdir, memory_args):
 
     d1 = run(36)
     # allow a healthy savings margin for network flake
-    assert d1 < d0 * 6
+    assert d1 < d0 * 4
 
 
 def test_cache_retry(testdir, memory_args):
