@@ -219,7 +219,7 @@ class LinkItem(pytest.Item):
         return self.fspath, 0, self.description
 
     def sleep(self, headers):
-        """Handle responses with a Retry-After header.
+        """Handle responses or errors with a Retry-After header.
 
         https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.37
         """
