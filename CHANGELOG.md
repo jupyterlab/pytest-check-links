@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.4.2
+* Another improvement to retry logic [#20](https://github.com/jupyterlab/pytest-check-links/pull/20)
+
 ## 0.4.1
 * Clean up metadata for dist generation [#19](https://github.com/jupyterlab/pytest-check-links/pull/19)
 * Improve retry logic and add python 3 classifier [#18](https://github.com/jupyterlab/pytest-check-links/pull/18)
