@@ -218,12 +218,12 @@ class LinkItem(pytest.Item):
     def reportinfo(self):
         return self.fspath, 0, self.description
 
-    def sleep(self, response):
+    def sleep(self, headers):
         """Handle responses with a Retry-After header.
 
         https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.37
         """
-        header = response.headers.get('Retry-After')
+        header = headers.get('Retry-After')
 
         if header is None:
             return False
@@ -266,14 +266,14 @@ class LinkItem(pytest.Item):
         try:
             response = session.get(url_no_anchor)
         except Exception as err:
-            if hasattr(err, 'response') and retries and self.sleep(err.response):
+            if hasattr(err, 'headers') and retries and self.sleep(err.headers):
                 self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
 
             raise BrokenLinkError(url, "%s" % err)
 
         if response.status_code >= 400:
-            if retries and self.sleep(response):
+            if retries and self.sleep(response.headers):
                 self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
 
