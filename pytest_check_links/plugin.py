@@ -246,7 +246,8 @@ class LinkItem(pytest.Item):
     def handle_anchor(self, parsed, anchor):
         """Verify an anchor exists in the parsed HTML
         """
-        anchors = parsed.findall('*//*[@name="{0}" or @id="{0}"]'.format(anchor))
+        anchors = set(parsed.findall('*//a[@name="{}"]'.format(anchor)))
+        anchors |= set(parsed.findall('*//*[@id="{}"]'.format(anchor)))
 
         if not anchors:
             raise BrokenLinkError(self.target, "Missing anchor: %s" % anchor)
