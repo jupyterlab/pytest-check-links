@@ -93,7 +93,10 @@ def ensure_requests_session(config):
 class CheckLinks(pytest.File):
     """Check the links in a file"""
     def __init__(self, parent=None, path=None, requests_session=None, check_anchors=False):
-        super(CheckLinks, self).__init__(parent=parent, path=path)
+        if hasattr(pytest.File, "from_parent"):
+            super(CheckLinks, self).__init__(parent, path=path)
+        else:
+            super(CheckLinks, self).__init__(path, parent)
         self.check_anchors = check_anchors
         self.requests_session = requests_session
 
