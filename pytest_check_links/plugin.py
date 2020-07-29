@@ -61,9 +61,10 @@ def pytest_collect_file(path, parent):
     if config.option.check_links:
         requests_session = ensure_requests_session(config)
         if path.ext.lower() in config.option.links_ext:
+            check_anchors = config.option.check_anchors
             if hasattr(CheckLinks, "from_parent"):
-                return CheckLinks.from_parent(path, parent, requests_session, config.option.check_anchors)
-            return CheckLinks(path, parent, requests_session, config.option.check_anchors)
+                return CheckLinks.from_parent(parent, path=path, requests_session=requests_session, check_anchors=check_anchors)
+            return CheckLinks(path=path, parent=parent, requests_session=requests_session, check_anchors=check_anchors)
 
 def ensure_requests_session(config):
     """Build the singleton requests.Session (or subclass)
@@ -91,8 +92,8 @@ def ensure_requests_session(config):
 
 class CheckLinks(pytest.File):
     """Check the links in a file"""
-    def __init__(self, path, parent, requests_session, check_anchors=False):
-        super(CheckLinks, self).__init__(path, parent)
+    def __init__(self, parent=None, path=None, requests_session=None, check_anchors=False):
+        super(CheckLinks, self).__init__(parent=parent, path=path)
         self.check_anchors = check_anchors
         self.requests_session = requests_session
 
