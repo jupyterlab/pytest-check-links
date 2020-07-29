@@ -61,8 +61,10 @@ def pytest_collect_file(path, parent):
     if config.option.check_links:
         requests_session = ensure_requests_session(config)
         if path.ext.lower() in config.option.links_ext:
-            return CheckLinks(path, parent, requests_session, config.option.check_anchors)
-
+            check_anchors = config.option.check_anchors
+            if hasattr(CheckLinks, "from_parent"):
+                return CheckLinks.from_parent(parent, fspath=path, requests_session=requests_session, check_anchors=check_anchors)
+            return CheckLinks(fspath=path, parent=parent, requests_session=requests_session, check_anchors=check_anchors)
 
 def ensure_requests_session(config):
     """Build the singleton requests.Session (or subclass)
@@ -90,8 +92,8 @@ def ensure_requests_session(config):
 
 class CheckLinks(pytest.File):
     """Check the links in a file"""
-    def __init__(self, path, parent, requests_session, check_anchors=False):
-        super(CheckLinks, self).__init__(path, parent)
+    def __init__(self, parent=None, fspath=None, requests_session=None, check_anchors=False):
+        super(CheckLinks, self).__init__(fspath, parent)
         self.check_anchors = check_anchors
         self.requests_session = requests_session
 
@@ -189,7 +191,10 @@ def links_in_html(base_name, parent, html):
                 if proto.lower() not in {'http', 'https'}:
                     # ignore non-http links (mailto:, data:, etc.)
                     continue
-            yield LinkItem(name, parent, url, parsed)
+            if hasattr(LinkItem, "from_parent"):
+                yield LinkItem.from_parent(parent, name=name, target=url, parsed=parsed)
+            else:
+                yield LinkItem(name=name, parent=parent, target=url, parsed=parsed)
 
 
 class LinkItem(pytest.Item):
@@ -202,7 +207,7 @@ class LinkItem(pytest.Item):
         parsed (xml.etree.ElementTree.Element): The parsed HTML
         description (str, optional): The description to be used in the report header
     """
-    def __init__(self, name, parent, target, parsed, description=''):
+    def __init__(self, name=None, parent=None, target=None, parsed=None, description=''):
         super(LinkItem, self).__init__(name, parent)
         self.target = target
         self.parsed = parsed

@@ -2,5 +2,5 @@ docutils
 html5lib
 nbconvert
 nbformat
-pytest >= 2.8
+pytest >= 4.6
 requests
