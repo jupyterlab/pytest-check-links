@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.4.3
+* Update for recommended usage of CheckLinks [#22](https://github.com/jupyterlab/pytest-check-links/pull/22)
+
 ## 0.4.2
 * Another improvement to retry logic [#20](https://github.com/jupyterlab/pytest-check-links/pull/20)
 
