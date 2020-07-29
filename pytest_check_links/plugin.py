@@ -191,7 +191,9 @@ def links_in_html(base_name, parent, html):
                 if proto.lower() not in {'http', 'https'}:
                     # ignore non-http links (mailto:, data:, etc.)
                     continue
-            yield LinkItem(name, parent, url, parsed)
+            if hasattr(LinkItem, "from_parent"):
+                yield LinkItem.from_parent(parent, name=name, url=url, parsed=parsed)
+            yield LinkItem(name=name, parent=parent, url=url, parsed=parsed)
 
 
 class LinkItem(pytest.Item):
@@ -204,7 +206,7 @@ class LinkItem(pytest.Item):
         parsed (xml.etree.ElementTree.Element): The parsed HTML
         description (str, optional): The description to be used in the report header
     """
-    def __init__(self, name, parent, target, parsed, description=''):
+    def __init__(self, name=None, parent=None, target=None, parsed=None, description=''):
         super(LinkItem, self).__init__(name, parent)
         self.target = target
         self.parsed = parsed
