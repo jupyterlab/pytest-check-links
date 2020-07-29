@@ -56,7 +56,7 @@ def pytest_configure(config):
         validate_extensions(config.option.links_ext)
 
 
-def pytest_collect_file(fspath, parent):
+def pytest_collect_file(path, parent):
     config = parent.config
     if config.option.check_links:
         requests_session = ensure_requests_session(config)
