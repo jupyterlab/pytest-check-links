@@ -192,8 +192,8 @@ def links_in_html(base_name, parent, html):
                     # ignore non-http links (mailto:, data:, etc.)
                     continue
             if hasattr(LinkItem, "from_parent"):
-                yield LinkItem.from_parent(parent, name=name, url=url, parsed=parsed)
-            yield LinkItem(name=name, parent=parent, url=url, parsed=parsed)
+                yield LinkItem.from_parent(parent, name=name, target=url, parsed=parsed)
+            yield LinkItem(name=name, parent=parent, target=url, parsed=parsed)
 
 
 class LinkItem(pytest.Item):
