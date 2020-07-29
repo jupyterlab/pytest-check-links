@@ -61,7 +61,7 @@ def pytest_collect_file(path, parent):
     if config.option.check_links:
         requests_session = ensure_requests_session(config)
         if path.ext.lower() in config.option.links_ext:
-            return CheckLinks(path, parent, requests_session, config.option.check_anchors)
+            return CheckLinks.from_parent(path, parent, requests_session, config.option.check_anchors)
 
 
 def ensure_requests_session(config):
