@@ -167,7 +167,7 @@ def links_in_html(base_name, parent, html):
     """
     parsed = html5lib.parse(html, namespaceHTMLElements=False)
 
-    for element in parsed.getiterator():
+    for element in parsed.iter():
         url = None
         tag = element.tag
         if tag == 'a':
