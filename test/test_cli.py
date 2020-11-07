@@ -19,6 +19,6 @@ def test_cli_pass(testdir, example, rc, expected, unexpected):
     summary = stdout.decode('utf-8').strip().splitlines()[-1]
     assert rc == proc.returncode
     for ex in expected:
-        assert ex in summary
+        assert ex in summary, stdout.decode('utf-8')
     for unex in unexpected:
-        assert unex not in summary
+        assert unex not in summary, stdout.decode('utf-8')

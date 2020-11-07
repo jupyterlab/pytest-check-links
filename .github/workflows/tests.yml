@@ -44,7 +44,7 @@ jobs:
       - name: Run python tests
         # disable automatic inclusion for coverage
         run: |
-          pytest -p no:check-links --cov pytest_check_links --cov-report term-missing
+          pytest -vv -p no:check-links --cov pytest_check_links --cov-report term-missing
       - name: Upload coverage
         run: |
           codecov
