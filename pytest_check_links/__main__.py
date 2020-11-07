@@ -6,6 +6,8 @@ to collect further tests. If that is the case, you can disable
 these plugins with the py.test command line option
 "-p no:<plugin-name-here>".
 """
+# pragma: no cover
+
 import sys
 
 
