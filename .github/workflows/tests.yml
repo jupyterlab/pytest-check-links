@@ -35,7 +35,7 @@ jobs:
           architecture: 'x64'
       - name: Install python dependencies
         run: |
-          pip install setuptools pip --upgrade --user
+          pip install --upgrade --user setuptools pip wheel
           pip install --upgrade .[cache] pytest-cov codecov
       - name: Show python environment
         run: |

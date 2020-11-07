@@ -15,7 +15,7 @@ reStructuredText file
 definitions <http://slashdot.org>`__
 
 Or leave it empty and use the `link text
-itself <http://www.reddit.com>`__.
+itself <https://www.w3.org>`__.
 
 URLs will automatically get turned into
 links. http://www.example.com or http://www.example.com/404.
