@@ -21,13 +21,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
       - name: Cache pip
         uses: actions/cache@v1
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-py-${{ matrix.PYTHON_VERSION }}-pip-${{ hashFiles('requirements.txt', 'setup.cfg') }}
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ matrix.PYTHON_VERSION }}-${{ hashFiles('requirements.txt', 'setup.cfg') }}
           restore-keys: |
-            ${{ runner.os }}-py-${{ matrix.PYTHON_VERSION }}-pip-
+            ${{ runner.os }}-pip-${{ matrix.PYTHON_VERSION }}-
+            ${{ runner.os }}-pip-
       - name: Setup python ${{ matrix.PYTHON_VERSION }}
         uses: actions/setup-python@v1
         with:
