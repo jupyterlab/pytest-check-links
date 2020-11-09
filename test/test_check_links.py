@@ -1,4 +1,4 @@
-from . import examples
+from .conftest import skip_pywin32
 
 
 def test_ipynb(testdir):
@@ -11,6 +11,7 @@ def test_markdown(testdir):
     result = testdir.runpytest("-v", "--check-links")
     result.assert_outcomes(passed=8, failed=4)
 
+@skip_pywin32
 def test_rst(testdir):
     testdir.copy_example('rst.rst')
     result = testdir.runpytest("-v", "--check-links")
@@ -20,5 +21,5 @@ def test_link_ext(testdir):
     testdir.copy_example('linkcheck.ipynb')
     testdir.copy_example('rst.rst')
     testdir.copy_example('markdown.md')
-    result = testdir.runpytest("-v", "--check-links", "--links-ext=.md,rst")
-    result.assert_outcomes(passed=15, failed=6)
+    result = testdir.runpytest("-v", "--check-links", "--links-ext=md,ipynb")
+    result.assert_outcomes(passed=11, failed=7)

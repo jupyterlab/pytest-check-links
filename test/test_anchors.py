@@ -1,11 +1,4 @@
-from . import examples
-
 import pytest
-
-
-@pytest.fixture
-def anchor_args():
-    return ["-v", "--check-links", "--check-anchors"]
 
 
 def test_anchors_local_self(testdir, anchor_args):
