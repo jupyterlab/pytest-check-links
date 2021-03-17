@@ -1,6 +1,7 @@
 from docutils.core import publish_parts
 import io
 import os
+import re
 import time
 import warnings
 
@@ -36,7 +37,8 @@ def pytest_addoption(parser):
              "as a comma-separated list of values. Supported "
              "extensions are: %s." %
                 extensions_str(supported_extensions))
-
+    group.addoption('--link-check-ignore', action='append',
+        help="A list of regular expressions that match URIs that should not be checked.")
     group.addoption('--check-links-cache', action='store_true',
         help="Cache requests when checking links")
     group.addoption('--check-links-cache-name', action=StoreCacheAction,
@@ -51,6 +53,7 @@ def pytest_addoption(parser):
         help="Backend-specific options for link cache, specfied as `opt:value`")
 
 
+
 def pytest_configure(config):
     if config.option.links_ext:
         validate_extensions(config.option.links_ext)
@@ -58,13 +61,14 @@ def pytest_configure(config):
 
 def pytest_collect_file(path, parent):
     config = parent.config
+    ignore_links = config.option.link_check_ignore
     if config.option.check_links:
         requests_session = ensure_requests_session(config)
         if path.ext.lower() in config.option.links_ext:
             check_anchors = config.option.check_anchors
             if hasattr(CheckLinks, "from_parent"):
-                return CheckLinks.from_parent(parent, fspath=path, requests_session=requests_session, check_anchors=check_anchors)
-            return CheckLinks(fspath=path, parent=parent, requests_session=requests_session, check_anchors=check_anchors)
+                return CheckLinks.from_parent(parent, fspath=path, requests_session=requests_session, check_anchors=check_anchors, ignore_links=ignore_links)
+            return CheckLinks(fspath=path, parent=parent, requests_session=requests_session, check_anchors=check_anchors, ignore_links=ignore_links)
 
 def ensure_requests_session(config):
     """Build the singleton requests.Session (or subclass)
@@ -92,10 +96,11 @@ def ensure_requests_session(config):
 
 class CheckLinks(pytest.File):
     """Check the links in a file"""
-    def __init__(self, parent=None, fspath=None, requests_session=None, check_anchors=False):
+    def __init__(self, parent=None, fspath=None, requests_session=None, check_anchors=False, ignore_links=None):
         super(CheckLinks, self).__init__(fspath, parent)
         self.check_anchors = check_anchors
         self.requests_session = requests_session
+        self.ignore_links = ignore_links or []
 
     def _html_from_html(self):
         """Return HTML from an HTML file"""
@@ -146,7 +151,12 @@ class CheckLinks(pytest.File):
             html = self._html_from_rst()
 
         for item in links_in_html(path, self, html):
-            yield item
+            ignore = False
+            for pattern in self.ignore_links:
+                if re.match(pattern, item.target):
+                    ignore = True
+            if not ignore:
+                yield item
 
 
 class BrokenLinkError(Exception):
