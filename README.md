@@ -37,6 +37,15 @@ Also check whether links with `#anchors` HTML files (either local, or with
 served with `html` in the `Content-Type`) actually exist, and point to _exactly one_
 named anchor.
 
+#### --check-links-ignore
+
+A regular expression that matches URIs that should not be checked.
+Can be specified multiple times for multiple ignore patterns.
+This can be used for files that have a lot of links to GitHub pages,
+such as a Changelog.  GitHub has rate limiting, which would normally cause these files to take up to an hour to complete for larger repositories.  For example:
+
+    pytest --check-links --link-check-ignore "https://github.com/.*/pull/.*" CHANGELOG.md
+
 ### Cache
 
 Caching requires the installation of `requests-cache`.

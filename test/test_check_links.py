@@ -10,6 +10,8 @@ def test_markdown(testdir):
     testdir.copy_example('markdown.md')
     result = testdir.runpytest("-v", "--check-links")
     result.assert_outcomes(passed=8, failed=4)
+    result = testdir.runpytest("-v", "--check-links", "--check-links-ignore", "http.*example.com/.*")
+    result.assert_outcomes(passed=8, failed=1)
 
 @skip_pywin32
 def test_rst(testdir):
