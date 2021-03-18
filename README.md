@@ -37,7 +37,7 @@ Also check whether links with `#anchors` HTML files (either local, or with
 served with `html` in the `Content-Type`) actually exist, and point to _exactly one_
 named anchor.
 
-#### --link-check-ignore
+#### --check-links-ignore
 
 A regular expression that matches URIs that should not be checked.
 Can be specified multiple times for multiple ignore patterns.

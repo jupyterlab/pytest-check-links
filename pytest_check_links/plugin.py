@@ -37,7 +37,7 @@ def pytest_addoption(parser):
              "as a comma-separated list of values. Supported "
              "extensions are: %s." %
                 extensions_str(supported_extensions))
-    group.addoption('--link-check-ignore', action='append',
+    group.addoption('--check-links-ignore', action='append',
         help="A list of regular expressions that match URIs that should not be checked.")
     group.addoption('--check-links-cache', action='store_true',
         help="Cache requests when checking links")
@@ -61,7 +61,7 @@ def pytest_configure(config):
 
 def pytest_collect_file(path, parent):
     config = parent.config
-    ignore_links = config.option.link_check_ignore
+    ignore_links = config.option.check_links_ignore
     if config.option.check_links:
         requests_session = ensure_requests_session(config)
         if path.ext.lower() in config.option.links_ext:
