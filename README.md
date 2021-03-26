@@ -44,7 +44,7 @@ Can be specified multiple times for multiple ignore patterns.
 This can be used for files that have a lot of links to GitHub pages,
 such as a Changelog.  GitHub has rate limiting, which would normally cause these files to take up to an hour to complete for larger repositories.  For example:
 
-    pytest --check-links --link-check-ignore "https://github.com/.*/pull/.*" CHANGELOG.md
+    pytest --check-links --check-links-ignore "https://github.com/.*/pull/.*" CHANGELOG.md
 
 ### Cache
 
