@@ -119,7 +119,7 @@ class CheckLinks(pytest.File):
         """Return HTML from an rst file"""
         with io.open(str(self.fspath), encoding=_ENC) as f:
             rst = f.read()
-        return publish_parts(rst, writer_name='html')['html_body']
+        return publish_parts(rst, source_path=str(self.fspath), writer_name='html')['html_body']
 
     def _items_from_notebook(self):
         """Yield LinkItems from a notebook"""
