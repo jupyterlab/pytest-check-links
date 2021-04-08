@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.5.1
+
+* Fix handling of Nested RST links [#33](https://github.com/jupyterlab/pytest-check-links/pull/33) ([@jtpio](https://github.com/jtpio))
+* Fix check-links-ignore example in Readme [#32](https://github.com/jupyterlab/pytest-check-links/pull/32) ([@blink1073](https://github.com/blink1073))
+
 ## 0.5.0
 
 * Add Ability to Ignore Link Patterns [#30](https://github.com/jupyterlab/pytest-check-links/pull/30) ([@afshin](https://github.com/afshin))
