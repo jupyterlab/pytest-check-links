@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.5.2
+
+* Handle attachments in notebook cells [#36](https://github.com/jupyterlab/pytest-check-links/pull/36) ([@jtpio](https://github.com/jtpio))
+
 ## 0.5.1
 
 * Fix handling of Nested RST links [#33](https://github.com/jupyterlab/pytest-check-links/pull/33) ([@jtpio](https://github.com/jtpio))
