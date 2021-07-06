@@ -8,7 +8,7 @@ def test_cli_meta():
 
 
 @pytest.mark.parametrize("example,rc,expected,unexpected", [
-    ["httpbin.md", 0, [" 6 passed"], [" failed", " warning"]],
+    ["httpbin.md", 0, [" 6 passed"], [" failed"]],
     ["rst.rst", 1, [" 2 failed", " 7 passed"], [" warning"]]
 ])
 def test_cli_pass(testdir, example, rc, expected, unexpected):

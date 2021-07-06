@@ -124,14 +124,16 @@ class CheckLinks(pytest.File):
     def _items_from_notebook(self):
         """Yield LinkItems from a notebook"""
         import nbformat
-        from nbconvert.filters import markdown2html
+        from nbconvert.filters.markdown_mistune import IPythonRenderer, MarkdownWithMath
 
         nb = nbformat.read(str(self.fspath), as_version=4)
         for cell_num, cell in enumerate(nb.cells):
             if cell.cell_type != 'markdown':
                 continue
 
-            html = markdown2html(cell.source)
+            attachments = cell.get('attachments', {})
+            renderer = IPythonRenderer(escape=False, attachments=attachments)
+            html = MarkdownWithMath(renderer=renderer).render(cell.source)
             basename = 'Cell %i' % cell_num
             for item in links_in_html(basename, self, html):
                 yield item
