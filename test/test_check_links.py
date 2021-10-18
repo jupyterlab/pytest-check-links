@@ -6,6 +6,8 @@ from .conftest import skip_pywin32
 def test_ipynb(testdir):
     testdir.copy_example('linkcheck.ipynb')
     result = testdir.runpytest("-v", "--check-links")
+    result.assert_outcomes(passed=3, failed=4)
+    result = testdir.runpytest("-v", "--check-links", "--check-links-ignore", "http.*example.com/.*")
     result.assert_outcomes(passed=3, failed=3)
 
 def test_markdown(testdir):
