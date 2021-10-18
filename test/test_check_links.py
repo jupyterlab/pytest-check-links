@@ -49,4 +49,4 @@ def test_link_ext(testdir):
     testdir.copy_example('rst.rst')
     testdir.copy_example('markdown.md')
     result = testdir.runpytest("-v", "--check-links", "--links-ext=md,ipynb")
-    result.assert_outcomes(passed=11, failed=7)
+    result.assert_outcomes(passed=11, failed=8)
