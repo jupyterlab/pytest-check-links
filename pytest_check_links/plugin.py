@@ -136,7 +136,12 @@ class CheckLinks(pytest.File):
             html = MarkdownWithMath(renderer=renderer).render(cell.source)
             basename = 'Cell %i' % cell_num
             for item in links_in_html(basename, self, html):
-                yield item
+                ignore = False
+                for pattern in self.ignore_links:
+                    if re.match(pattern, item.target):
+                        ignore = True
+                if not ignore:
+                    yield item
 
     def collect(self):
         path = self.fspath

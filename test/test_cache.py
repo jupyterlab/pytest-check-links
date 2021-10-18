@@ -31,7 +31,7 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
     args = base_args + ["--check-links-cache-expire-after", "2"]
     if cache_name:
         args += ["--check-links-cache-name", os.path.join(str(tmpdir), cache_name)]
-    expected = dict(passed=3, failed=3)
+    expected = dict(passed=3, failed=4)
     t0 = time.time()
     result = testdir.runpytest(*args)
     t1 = time.time()
