@@ -46,9 +46,11 @@ jobs:
           pip install --upgrade -vv .[cache] pytest-cov codecov
       - name: Show python environment
         run: |
+          which python
           python --version
           python -m pip list
           cat /Users/runner/hostedtoolcache/Python/3.10.0/x64/bin/pytest-check-links
+          python -m pytest_check_links --version
           pytest-check-links --help
       - name: Run python tests
         # disable automatic inclusion for coverage
