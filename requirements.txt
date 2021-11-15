@@ -1,6 +1,0 @@
-docutils
-html5lib
-nbconvert
-nbformat
-pytest >= 4.6
-requests
