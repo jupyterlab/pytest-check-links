@@ -1,9 +1,13 @@
 # Change Log
 
+<!-- <START NEW CHANGELOG ENTRY> -->
+
 ## 0.6.0
 
 - Handle ignore links for `ipynb` files [#39](https://github.com/jupyterlab/pytest-check-links/pull/39) ([@pratyakshajha](https://github.com/pratyakshajha))
 - Drop support for Python 3.6 and add support for Python 3.10 [#40](https://github.com/jupyterlab/pytest-check-links/pull/40) ([@blink1073](https://github.com/blink1073))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.5.2
 
