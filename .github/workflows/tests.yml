@@ -46,7 +46,6 @@ jobs:
           pip install --upgrade -vv .[cache] pytest-cov codecov
       - name: Show python environment
         run: |
-          set -x
           which python
           python --version
           python -m pip list
