@@ -5,6 +5,9 @@ build-backend = "setuptools.build_meta"
 [tool.jupyter-releaser]
 skip = ["check-links"]
 
+[tool.jupyter-releaser.options]
+ignore-glob = ["examples/markdown.md"]
+
 [tool.tbump.version]
 current = "0.6.0"
 regex = '''
