@@ -17,4 +17,4 @@ message_template = "Bump to {new_version}"
 tag_template = "v{new_version}"
 
 [[tool.tbump.file]]
-src = "jupyter_packaging/setupbase.py"
+src = "pytest_check_links/_version.py"
