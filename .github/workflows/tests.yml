@@ -46,12 +46,13 @@ jobs:
           pip install --upgrade -vv .[cache] pytest-cov codecov
       - name: Show python environment
         run: |
+          which python
           python --version
           python -m pip list
       - name: Run python tests
         # disable automatic inclusion for coverage
         run: |
-          pytest -vv -p no:check-links --cov pytest_check_links --cov-report term-missing
+          pytest -vv -p no:check-links --cov pytest_check_links --cov-report term-missing || pytest -vv -p no:check-links --cov pytest_check_links --cov-report term-missing --lf
       - name: Upload coverage
         run: |
           codecov
