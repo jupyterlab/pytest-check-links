@@ -50,9 +50,6 @@ jobs:
           which python
           python --version
           python -m pip list
-          cat /Users/runner/hostedtoolcache/Python/3.10.0/x64/bin/pytest-check-links
-          /Users/runner/hostedtoolcache/Python/3.10.0/x64/bin/python -m pytest_check_links --version
-          pytest-check-links --help
       - name: Run python tests
         # disable automatic inclusion for coverage
         run: |
