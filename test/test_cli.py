@@ -14,11 +14,11 @@ def test_cli_meta():
 def test_cli_pass(testdir, example, rc, expected, unexpected):
     testdir.copy_example(example)
     testdir.copy_example("setup.cfg")
-    proc = subprocess.Popen(["pytest-check-links"], stdout=subprocess.PIPE)
-    stdout, stderr = proc.communicate()
+    proc = subprocess.Popen(["pytest-check-links"], stdout=subprocess.PIPE, shell=True)
+    stdout, _ = proc.communicate()
     output = stdout.decode('utf-8').strip().splitlines()
-    print(output)
     assert rc == proc.returncode
+    assert output
     summary = output[-1]
     for ex in expected:
         assert ex in summary, stdout.decode('utf-8')
