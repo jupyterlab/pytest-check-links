@@ -1,4 +1,3 @@
-import io
 import os
 import re
 import time
@@ -9,7 +8,7 @@ import html5lib
 import pytest
 from docutils.core import publish_parts
 from requests import Request, Session
-from requests.compat import unquote
+from requests.utils import unquote  # type:ignore
 
 from .args import StoreCacheAction, StoreExtensionsAction
 
@@ -121,7 +120,7 @@ def ensure_requests_session(config):
     return getattr(config.option, session_attr)
 
 
-class CheckLinks(pytest.File):
+class CheckLinks(pytest.File):  # type:ignore[misc]
     """Check the links in a file"""
 
     def __init__(self, *, requests_session=None, check_anchors=False, ignore_links=None, **kwargs):
@@ -244,7 +243,7 @@ def links_in_html(base_name, parent, html):
                 yield LinkItem(name=name, parent=parent, target=url, parsed=parsed)
 
 
-class LinkItem(pytest.Item):
+class LinkItem(pytest.Item):  # type:ignore[misc]
 
     """Test item for an HTML link
 
@@ -321,7 +320,11 @@ class LinkItem(pytest.Item):
         try:
             response = session.get(url_no_anchor)
         except Exception as err:
-            if hasattr(err, "headers") and retries and self.sleep(err.headers):
+            if (
+                hasattr(err, "headers")
+                and retries
+                and self.sleep(err.headers)  # type:ignore[attr-defined]
+            ):
                 self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
 
@@ -341,8 +344,9 @@ class LinkItem(pytest.Item):
         session = self.parent.requests_session
         if hasattr(session, "cache"):
             request = Request("GET", url, headers=session.headers).prepare()
+            assert session.cache is not None
             key = session.cache.create_key(request)
-            if session.cache.has_key(key):
+            if key in session.cache:
                 session.cache.delete(key)
                 uncached = True
         return uncached
@@ -403,4 +407,4 @@ def extensions_str(extensions):
 def validate_extensions(extensions):
     invalid = set(extensions) - supported_extensions
     if invalid:
-        warnings.warn("C1", "Unsupported extensions for check-links: %s" % extensions_str(invalid))
+        warnings.warn("Unsupported extensions for check-links: %s" % extensions_str(invalid))

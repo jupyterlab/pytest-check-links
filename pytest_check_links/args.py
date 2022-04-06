@@ -33,7 +33,7 @@ class StoreCacheAction(argparse.Action):
             key, value = str(values).split(":", 1)
             try:
                 kwargs[key] = json.loads(value)
-            except:
+            except Exception:
                 kwargs[key] = value
         else:
             kwargs[dest] = values
