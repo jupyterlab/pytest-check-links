@@ -13,12 +13,11 @@ import subprocess
 
 
 def main(args=None):
-    import pytest
 
     if args is None:
         args = sys.argv[1:]
 
-    return subprocess.call(['pytest', '--check-links', '-p', 'no:python'] + args)
+    return subprocess.call([sys.executable, '-m', 'pytest', '--check-links', '-p', 'no:python'] + args)
 
 
 if __name__ == '__main__':
