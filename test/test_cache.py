@@ -1,6 +1,7 @@
 import os
 import time
 import shutil
+import sys
 
 from glob import glob
 
@@ -19,6 +20,7 @@ def assert_sqlite(testdir, name=None, tmpdir=None, exists=True):
         assert not caches
 
 
+@pytest.mark.skipif(sys.implementation.name.lower() == 'pypy', reason='Does not work on pypy')
 @pytest.mark.parametrize("cache_name", [
     None,
     "custom-cache"
