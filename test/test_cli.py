@@ -2,9 +2,20 @@ import subprocess
 import pytest
 
 
-def test_cli_meta():
-    assert subprocess.call(["pytest-check-links", "--version"]) == 0
-    assert subprocess.call(["pytest-check-links", "--help"]) == 0
+def run(cmd, rc=0):
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = proc.communicate()
+    output = stdout.decode('utf-8').strip().splitlines()
+    err = stderr.decode('utf-8').strip().splitlines()
+    assert rc == proc.returncode
+    return output, err
+
+def test_cli_version():
+    run(["pytest-check-links", "--version"])
+
+
+def test_cli_help():
+    run(["pytest-check-links", "--help"])
 
 
 @pytest.mark.parametrize("example,rc,expected,unexpected", [
@@ -14,13 +25,10 @@ def test_cli_meta():
 def test_cli_pass(testdir, example, rc, expected, unexpected):
     testdir.copy_example(example)
     testdir.copy_example("setup.cfg")
-    proc = subprocess.Popen(["pytest-check-links"], stdout=subprocess.PIPE, shell=True)
-    stdout, _ = proc.communicate()
-    output = stdout.decode('utf-8').strip().splitlines()
-    assert rc == proc.returncode
+    output, _ = run(["pytest-check-links"], rc)
     assert output
     summary = output[-1]
     for ex in expected:
-        assert ex in summary, stdout.decode('utf-8')
+        assert ex in summary, output
     for unex in unexpected:
-        assert unex not in summary, stdout.decode('utf-8')
+        assert unex not in summary, output

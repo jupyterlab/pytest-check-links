@@ -9,6 +9,7 @@ these plugins with the py.test command line option
 # pragma: no cover
 
 import sys
+import subprocess
 
 
 def main(args=None):
@@ -17,11 +18,7 @@ def main(args=None):
     if args is None:
         args = sys.argv[1:]
 
-    return pytest.main(args + [
-        '--check-links',
-    ], [
-        'no:python',
-    ])
+    return subprocess.call(['pytest', '--check-links', '-p', 'no:python'] + args)
 
 
 if __name__ == '__main__':

@@ -26,7 +26,5 @@ src = "pytest_check_links/_version.py"
 addopts = "-raXs --durations 10 --color=yes --doctest-modules"
 filterwarnings = [
   "error",
-  # For cli checks
-  "ignore:Module already imported so cannot be rewritten:pytest.PytestAssertRewriteWarning",
 ]
 pytester_example_dir = "examples"
