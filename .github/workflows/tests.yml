@@ -39,7 +39,7 @@ jobs:
         # disable automatic inclusion for coverage
         shell: bash
         run: |
-          args = "-vv -p no:check-links --cov pytest_check_links --cov-report term-missing"
+          args="-vv -p no:check-links --cov pytest_check_links --cov-report term-missing"
           python -m pytest $args || python -m pytest $args --lf
       - name: Upload coverage
         run: |
