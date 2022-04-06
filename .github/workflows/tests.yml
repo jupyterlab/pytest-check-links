@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - name: Install package and dependencies
         run: |
           pip install -vv .[test] pytest-cov codecov
