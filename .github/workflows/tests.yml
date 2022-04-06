@@ -37,8 +37,10 @@ jobs:
           python -m pip list
       - name: Run python tests
         # disable automatic inclusion for coverage
+        shell: bash
         run: |
-          pytest -vv -p no:check-links --cov pytest_check_links --cov-report term-missing || pytest -vv -p no:check-links --cov pytest_check_links --cov-report term-missing --lf
+          args = "-vv -p no:check-links --cov pytest_check_links --cov-report term-missing"
+          python -m pytest $args || python -m pytest $args --lf
       - name: Upload coverage
         run: |
           codecov

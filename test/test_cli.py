@@ -16,8 +16,10 @@ def test_cli_pass(testdir, example, rc, expected, unexpected):
     testdir.copy_example("setup.cfg")
     proc = subprocess.Popen(["pytest-check-links"], stdout=subprocess.PIPE)
     stdout, stderr = proc.communicate()
-    summary = stdout.decode('utf-8').strip().splitlines()[-1]
+    output = stdout.decode('utf-8').strip().splitlines()
+    print(output)
     assert rc == proc.returncode
+    summary = output[-1]
     for ex in expected:
         assert ex in summary, stdout.decode('utf-8')
     for unex in unexpected:
