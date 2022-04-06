@@ -346,7 +346,7 @@ class LinkItem(pytest.Item):  # type:ignore[misc]
             request = Request("GET", url, headers=session.headers).prepare()
             assert session.cache is not None
             key = session.cache.create_key(request)
-            if session.cache.haskey(key):
+            if session.cache.has_key(key):  # noqa
                 session.cache.delete(key)
                 uncached = True
         return uncached
