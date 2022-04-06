@@ -1,4 +1,5 @@
 import sys
+
 import pytest
 
 pytest_plugins = ["pytester"]
@@ -9,6 +10,7 @@ skip_pywin32 = pytest.mark.skipif(sys.platform == "win32", reason="pywin32 doubl
 @pytest.fixture
 def anchor_args():
     return ["-v", "--check-links", "--check-anchors"]
+
 
 @pytest.fixture
 def base_args():

@@ -1,12 +1,10 @@
 import os
-import time
 import shutil
 import sys
-
+import time
 from glob import glob
 
 import pytest
-
 import requests_cache
 
 
@@ -20,15 +18,11 @@ def assert_sqlite(testdir, name=None, tmpdir=None, exists=True):
         assert not caches
 
 
-@pytest.mark.skipif(sys.implementation.name.lower() == 'pypy', reason='Does not work on pypy')
-@pytest.mark.parametrize("cache_name", [
-    None,
-    "custom-cache"
-])
+@pytest.mark.skipif(sys.implementation.name.lower() == "pypy", reason="Does not work on pypy")
+@pytest.mark.parametrize("cache_name", [None, "custom-cache"])
 def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
-    """will the default sqlite3 backend persist and then expire?
-    """
-    testdir.copy_example('linkcheck.ipynb')
+    """will the default sqlite3 backend persist and then expire?"""
+    testdir.copy_example("linkcheck.ipynb")
 
     args = base_args + ["--check-links-cache-expire-after", "2"]
     if cache_name:
@@ -40,7 +34,7 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
     result.assert_outcomes(**expected)
 
     if cache_name:
-        assert_sqlite(testdir, name="{}.sqlite".format(cache_name), tmpdir=tmpdir)
+        assert_sqlite(testdir, name=f"{cache_name}.sqlite", tmpdir=tmpdir)
     else:
         assert_sqlite(testdir)
 
@@ -68,11 +62,10 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
 
 
 def test_cache_memory(testdir, memory_args):
-    """will the memory backend cache links inside a run?
-    """
+    """will the memory backend cache links inside a run?"""
     expected = dict(passed=3, failed=0)
 
-    testdir.copy_example('httpbin.md')
+    testdir.copy_example("httpbin.md")
 
     def run(passed):
         t0 = time.time()
@@ -87,7 +80,7 @@ def test_cache_memory(testdir, memory_args):
     for i in range(5):
         shutil.copy(
             os.path.join(str(testdir.tmpdir), "httpbin.md"),
-            os.path.join(str(testdir.tmpdir), "httpbin{}.md".format(i))
+            os.path.join(str(testdir.tmpdir), f"httpbin{i}.md"),
         )
 
     d1 = run(36)
@@ -96,10 +89,9 @@ def test_cache_memory(testdir, memory_args):
 
 
 def test_cache_retry(testdir, memory_args):
-    """will a Retry-After header work with cache?
-    """
+    """will a Retry-After header work with cache?"""
 
-    testdir.copy_example('httpbin.md')
+    testdir.copy_example("httpbin.md")
 
     attempts = []
 
@@ -109,7 +101,7 @@ def test_cache_retry(testdir, memory_args):
         response = _get(*args, **kwargs)
         if len(attempts) < 5:
             response.status_code = 502
-            response.headers['Retry-After'] = '0'
+            response.headers["Retry-After"] = "0"
         attempts.append([args, kwargs])
         return response
 
@@ -125,12 +117,16 @@ def test_cache_retry(testdir, memory_args):
 
 
 def test_cache_backend_opts(testdir, base_args):
-    testdir.copy_example('httpbin.md')
+    testdir.copy_example("httpbin.md")
     args = base_args + [
-        "--check-links-cache-backend-opt", "fast_save:true",
-        "--check-links-cache-name", "foo",
-        "--check-links-cache-backend-opt", "extension:.db",
-        "--check-links-cache-backend-opt", "allowable_codes:[200]"
+        "--check-links-cache-backend-opt",
+        "fast_save:true",
+        "--check-links-cache-name",
+        "foo",
+        "--check-links-cache-backend-opt",
+        "extension:.db",
+        "--check-links-cache-backend-opt",
+        "allowable_codes:[200]",
     ]
     result = testdir.runpytest(*args)
     result.assert_outcomes(passed=6, failed=0)

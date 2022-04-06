@@ -1,24 +1,24 @@
 import argparse
 import json
 
-class StoreExtensionsAction(argparse.Action):
 
+class StoreExtensionsAction(argparse.Action):
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs is not None:
             raise ValueError("nargs not allowed")
-        super(StoreExtensionsAction, self).__init__(option_strings, dest, **kwargs)
+        super().__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         values = self.parse_extensions(values)
         setattr(namespace, self.dest, values)
 
     def parse_extensions(self, csv):
-        return {'.%s' % ext.lstrip('.') for ext in csv.split(',')}
+        return {".%s" % ext.lstrip(".") for ext in csv.split(",")}
 
 
 class StoreCacheAction(argparse.Action):
-    """Build the cache session kwargs
-    """
+    """Build the cache session kwargs"""
+
     def __call__(self, parser, namespace, values, option_string=None):
         ns_name = "check_links_cache_kwargs"
         if not hasattr(namespace, ns_name):
