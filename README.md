@@ -7,7 +7,6 @@ pytest plugin that checks URLs for HTML-containing files.
 [![PyPI version](https://badge.fury.io/py/pytest-check-links.svg)](https://badge.fury.io/py/pytest-check-links)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pytest-check-links)
 
-
 ## Supported files
 
 - `.html`
@@ -42,7 +41,7 @@ named anchor.
 A regular expression that matches URIs that should not be checked.
 Can be specified multiple times for multiple ignore patterns.
 This can be used for files that have a lot of links to GitHub pages,
-such as a Changelog.  GitHub has rate limiting, which would normally cause these files to take up to an hour to complete for larger repositories.  For example:
+such as a Changelog. GitHub has rate limiting, which would normally cause these files to take up to an hour to complete for larger repositories. For example:
 
     pytest --check-links --check-links-ignore "https://github.com/.*/pull/.*" CHANGELOG.md
 
@@ -71,6 +70,7 @@ Name of link cache, either the base name of a file or similar, depending on back
 > default: `sqlite3`
 
 Cache persistence backend. The other known backends are:
+
 - `memory`
 - `redis`
 - `mongodb`
@@ -96,7 +96,6 @@ HTTP response codes (which requires a list of `int`s):
 ```bash
 --check-links-backend-opt allowable_codes:[200]
 ```
-
 
 ## TODO
 

@@ -8,8 +8,8 @@ these plugins with the py.test command line option
 """
 # pragma: no cover
 
-import sys
 import subprocess
+import sys
 
 
 def main(args=None):
@@ -17,8 +17,10 @@ def main(args=None):
     if args is None:
         args = sys.argv[1:]
 
-    return subprocess.call([sys.executable, '-m', 'pytest', '--check-links', '-p', 'no:python'] + args)
+    return subprocess.call(
+        [sys.executable, "-m", "pytest", "--check-links", "-p", "no:python"] + args
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())
