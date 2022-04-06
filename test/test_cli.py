@@ -1,5 +1,6 @@
 import subprocess
 import pytest
+import sys
 
 
 def run(cmd, rc=0):
@@ -20,6 +21,7 @@ def test_cli_help():
     run(["pytest-check-links", "--help"])
 
 
+@pytest.mark.skipif(sys.platform=='linux', reason='does not work on linux')
 @pytest.mark.parametrize("example,rc,expected,unexpected", [
     ["httpbin.md", 0, [" 6 passed"], [" failed"]],
     ["rst.rst", 1, [" 2 failed", " 7 passed"], [" warning"]]
