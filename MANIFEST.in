@@ -1,2 +1,4 @@
 prune examples
 include *.md
+include pyproject.toml
+exclude .pre-commit-config.yaml
