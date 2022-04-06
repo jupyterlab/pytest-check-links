@@ -21,3 +21,12 @@ tag_template = "v{new_version}"
 
 [[tool.tbump.file]]
 src = "pytest_check_links/_version.py"
+
+[tool.pytest.ini_options]
+addopts = "-raXs --durations 10 --color=yes --doctest-modules"
+filterwarnings = [
+  "error",
+  # For cli checks
+  "ignore:Module already imported so cannot be rewritten:pytest.PytestAssertRewriteWarning",
+]
+pytester_example_dir = "examples"

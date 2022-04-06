@@ -2,52 +2,38 @@ name: Tests
 
 on:
   push:
-    branches:
-      - master
-
+    branches: [master]
   pull_request:
-    branches:
-      - "*"
+  schedule:
+    - cron: "0 8 * * *"
 
 jobs:
   linux:
-    name: ${{ matrix.PLATFORM }} py${{ matrix.PYTHON_VERSION }}
-    runs-on: ${{ matrix.PLATFORM }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        PLATFORM: ['ubuntu-latest', 'macos-latest',  'windows-latest']
-        PYTHON_VERSION: ['3.7', '3.10']
+        os: ['ubuntu-latest', 'macos-latest',  'windows-latest']
+        python-version: ['3.7', '3.10']
+        include:
+          - os: windows-latest
+            python-version: "3.9"
+          - os: ubuntu-latest
+            python-version: "pypy-3.7"
+          - os: macos-latest
+            python-version: "3.8"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup python ${{ matrix.PYTHON_VERSION }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.PYTHON_VERSION }}
-          architecture: 'x64'
-      - name: Install python dependencies
-        run: |
-          pip install --upgrade --user setuptools pip wheel
-      - name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ matrix.PYTHON_VERSION }}-${{ hashFiles('requirements.txt', 'setup.cfg') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.PYTHON_VERSION }}-
-            ${{ runner.os }}-pip-
+      - name: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - name: Install package and dependencies
         run: |
-          pip install --upgrade -vv .[cache] pytest-cov codecov
+          pip install -vv .[test] pytest-cov codecov
       - name: Show python environment
         run: |
           which python
           python --version
+          python -m pip check
           python -m pip list
       - name: Run python tests
         # disable automatic inclusion for coverage
@@ -56,3 +42,57 @@ jobs:
       - name: Upload coverage
         run: |
           codecov
+
+  test_minimum_versions:
+    name: Test Minimum Versions
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Base Setup
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+        with:
+          python_version: "3.7"
+      - name: Install miniumum versions
+        uses: jupyterlab/maintainer-tools/.github/actions/install-minimums@v1
+      - name: Run the unit tests
+        run: |
+          pytest -vv -W default || pytest -vv -W default --lf
+
+  test_prereleases:
+    name: Test Prereleases
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Base Setup
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - name: Install the Python dependencies
+        run: |
+          pip install --pre -e ".[test]"
+      - name: List installed packages
+        run: |
+          pip freeze
+          pip check
+      - name: Run the tests
+        run: |
+          pytest -vv || pytest -vv --lf
+
+  make_sdist:
+    name: Make SDist
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/make-sdist@v1
+
+  test_sdist:
+    runs-on: ubuntu-latest
+    needs: [make_sdist]
+    name: Install from SDist and Test
+    timeout-minutes: 20
+    steps:
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/test-sdist@v1

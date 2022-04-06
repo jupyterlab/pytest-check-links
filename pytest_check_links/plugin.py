@@ -5,6 +5,8 @@ import re
 import time
 import warnings
 
+from pathlib import Path
+
 import html5lib
 import pytest
 from requests import Session, Request
@@ -65,10 +67,11 @@ def pytest_collect_file(path, parent):
     if config.option.check_links:
         requests_session = ensure_requests_session(config)
         if path.ext.lower() in config.option.links_ext:
+            path = Path(path)
             check_anchors = config.option.check_anchors
             if hasattr(CheckLinks, "from_parent"):
-                return CheckLinks.from_parent(parent, fspath=path, requests_session=requests_session, check_anchors=check_anchors, ignore_links=ignore_links)
-            return CheckLinks(fspath=path, parent=parent, requests_session=requests_session, check_anchors=check_anchors, ignore_links=ignore_links)
+                return CheckLinks.from_parent(parent, path=path, requests_session=requests_session, check_anchors=check_anchors, ignore_links=ignore_links)
+            return CheckLinks(path=path, parent=parent, requests_session=requests_session, check_anchors=check_anchors, ignore_links=ignore_links)
 
 def ensure_requests_session(config):
     """Build the singleton requests.Session (or subclass)
@@ -96,37 +99,40 @@ def ensure_requests_session(config):
 
 class CheckLinks(pytest.File):
     """Check the links in a file"""
-    def __init__(self, parent=None, fspath=None, requests_session=None, check_anchors=False, ignore_links=None):
-        super(CheckLinks, self).__init__(fspath, parent)
+    def __init__(self, *, requests_session=None, check_anchors=False, ignore_links=None, **kwargs):
+        super(CheckLinks, self).__init__(**kwargs)
         self.check_anchors = check_anchors
         self.requests_session = requests_session
         self.ignore_links = ignore_links or []
 
+    def teardown(self):
+        self.requests_session.close()
+
     def _html_from_html(self):
         """Return HTML from an HTML file"""
-        with io.open(str(self.fspath), encoding=_ENC) as f:
+        with io.open(str(self.path), encoding=_ENC) as f:
             return f.read()
 
     def _html_from_markdown(self):
         """Return HTML from a markdown file"""
         # FIXME: use commonmark or a pluggable engine
         from nbconvert.filters import markdown2html
-        with io.open(str(self.fspath), encoding=_ENC) as f:
+        with io.open(str(self.path), encoding=_ENC) as f:
             markdown = f.read()
         return markdown2html(markdown)
 
     def _html_from_rst(self):
         """Return HTML from an rst file"""
-        with io.open(str(self.fspath), encoding=_ENC) as f:
+        with io.open(str(self.path), encoding=_ENC) as f:
             rst = f.read()
-        return publish_parts(rst, source_path=str(self.fspath), writer_name='html')['html_body']
+        return publish_parts(rst, source_path=str(self.path), writer_name='html')['html_body']
 
     def _items_from_notebook(self):
         """Yield LinkItems from a notebook"""
         import nbformat
         from nbconvert.filters.markdown_mistune import IPythonRenderer, MarkdownWithMath
 
-        nb = nbformat.read(str(self.fspath), as_version=4)
+        nb = nbformat.read(str(self.path), as_version=4)
         for cell_num, cell in enumerate(nb.cells):
             if cell.cell_type != 'markdown':
                 continue
@@ -144,17 +150,17 @@ class CheckLinks(pytest.File):
                     yield item
 
     def collect(self):
-        path = self.fspath
-        if path.ext == '.ipynb':
+        path = self.path
+        if path.suffix == '.ipynb':
             for item in self._items_from_notebook():
                 yield item
             return
 
-        if path.ext == '.html':
+        if path.suffix == '.html':
             html = self._html_from_html()
-        elif path.ext == '.md':
+        elif path.suffix == '.md':
             html = self._html_from_markdown()
-        elif path.ext == '.rst':
+        elif path.suffix == '.rst':
             html = self._html_from_rst()
 
         for item in links_in_html(path, self, html):
@@ -215,6 +221,7 @@ def links_in_html(base_name, parent, html):
 
 
 class LinkItem(pytest.Item):
+
     """Test item for an HTML link
 
     Args:
@@ -224,11 +231,13 @@ class LinkItem(pytest.Item):
         parsed (xml.etree.ElementTree.Element): The parsed HTML
         description (str, optional): The description to be used in the report header
     """
-    def __init__(self, name=None, parent=None, target=None, parsed=None, description=''):
-        super(LinkItem, self).__init__(name, parent)
+    parent: CheckLinks
+
+    def __init__(self, name=None, parent=None, target=None, parsed=None, description='', **kwargs):
+        super(LinkItem, self).__init__(name, parent, **kwargs)
         self.target = target
         self.parsed = parsed
-        self.description = description or '{}: {}'.format(self.fspath, target)
+        self.description = description or '{}: {}'.format(self.path, target)
 
     def repr_failure(self, excinfo):
         exc = excinfo.value
@@ -238,7 +247,7 @@ class LinkItem(pytest.Item):
             return super(LinkItem, self).repr_failure(excinfo)
 
     def reportinfo(self):
-        return self.fspath, 0, self.description
+        return self.path, 0, self.description
 
     def sleep(self, headers):
         """Handle responses or errors with a Retry-After header.
@@ -322,7 +331,7 @@ class LinkItem(pytest.Item):
         return uncached
 
     def runtest(self):
-        url = self.target
+        url = self.target or ""
 
         if ':' in url:
             response = self.fetch_with_retries(url)
@@ -347,11 +356,11 @@ class LinkItem(pytest.Item):
                 return
 
             url_path = unquote(url).replace('/', os.path.sep)
-            dirpath = self.fspath.dirpath()
+            dirpath = self.path.parent
             exists = False
             for ext in supported_extensions:
                 rel_path = url_path.replace('.html', ext)
-                target_path = dirpath.join(rel_path)
+                target_path = dirpath.joinpath(rel_path)
                 if target_path.exists():
                     exists = True
                     # only check anchors in html for now
@@ -361,7 +370,7 @@ class LinkItem(pytest.Item):
                             return self.handle_anchor(parsed, anchor)
                     break
             if not exists:
-                target_path = dirpath.join(url_path)
+                target_path = dirpath.joinpath(url_path)
                 raise BrokenLinkError(url, "No such file: %s" % target_path)
 
 
