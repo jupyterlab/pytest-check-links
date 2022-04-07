@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.7.1
+
+([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.7.0...17cf01b96afe0f933b476fd2882009db440e805d))
+
+### Maintenance and upkeep improvements
+
+- Include py.typed file [#48](https://github.com/jupyterlab/pytest-check-links/pull/48) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2022-04-07&to=2022-04-07&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2022-04-07..2022-04-07&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.7.0
 
 ([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.6.0...3468259d8cd5b3becccb406bdc83c4611ade8f26))
@@ -26,8 +42,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2021-10-19&to=2022-04-07&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2021-10-19..2022-04-07&type=Issues) | [@codecov](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Acodecov+updated%3A2021-10-19..2022-04-07&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.6.0
 
