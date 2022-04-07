@@ -344,7 +344,8 @@ class LinkItem(pytest.Item):  # type:ignore[misc]
         session = self.parent.requests_session
         if hasattr(session, "cache"):
             request = Request("GET", url, headers=session.headers).prepare()
-            assert session.cache is not None
+            if session.cache is None:
+                raise ValueError("No session cache found")
             key = session.cache.create_key(request)
             if session.cache.has_key(key):  # noqa
                 session.cache.delete(key)
