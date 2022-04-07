@@ -2,12 +2,37 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.7.0
+
+([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.6.0...3468259d8cd5b3becccb406bdc83c4611ade8f26))
+
+### Enhancements made
+
+- Update for pytest 7 [#44](https://github.com/jupyterlab/pytest-check-links/pull/44) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- Add flake8 and mypy linting [#46](https://github.com/jupyterlab/pytest-check-links/pull/46) ([@blink1073](https://github.com/blink1073))
+- Apply Auto Formatting [#45](https://github.com/jupyterlab/pytest-check-links/pull/45) ([@blink1073](https://github.com/blink1073))
+- Enforce labels on PRs [#43](https://github.com/jupyterlab/pytest-check-links/pull/43) ([@blink1073](https://github.com/blink1073))
+- Update for Jupyter Releaser [#42](https://github.com/jupyterlab/pytest-check-links/pull/42) ([@blink1073](https://github.com/blink1073))
+
+### Documentation improvements
+
+- Add changelog entry for 0.6.0 [#41](https://github.com/jupyterlab/pytest-check-links/pull/41) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2021-10-19&to=2022-04-07&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2021-10-19..2022-04-07&type=Issues) | [@codecov](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Acodecov+updated%3A2021-10-19..2022-04-07&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.6.0
 
 - Handle ignore links for `ipynb` files [#39](https://github.com/jupyterlab/pytest-check-links/pull/39) ([@pratyakshajha](https://github.com/pratyakshajha))
 - Drop support for Python 3.6 and add support for Python 3.10 [#40](https://github.com/jupyterlab/pytest-check-links/pull/40) ([@blink1073](https://github.com/blink1073))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.5.2
 
