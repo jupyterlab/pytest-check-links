@@ -1,6 +1,3 @@
-import pytest
-
-
 def test_anchors_local_self(testdir, anchor_args):
     testdir.copy_example("anchors_self.html")
     result = testdir.runpytest(*anchor_args)

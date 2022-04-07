@@ -93,7 +93,7 @@ def test_cache_retry(testdir, memory_args):
 
     testdir.copy_example("httpbin.md")
 
-    attempts = []
+    attempts: list = []
 
     _get = requests_cache.CachedSession.get
 
