@@ -57,7 +57,7 @@ pytest-check-links = "pytest_check_links.__main__:main"
 check-links = "pytest_check_links.plugin"
 
 [tool.flit.sdist]
-include = ["test/"]
+include = ["examples", "test/"]
 
 [tool.jupyter-releaser]
 skip = ["check-links"]
