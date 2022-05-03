@@ -53,6 +53,9 @@ test = ["requests-cache~=0.5.2", "pre-commit"]
 [project.scripts]
 pytest-check-links = "pytest_check_links.__main__:main"
 
+[project.entry-points."pytest11"]
+check-links = "pytest_check_links.plugin"
+
 [tool.flit.sdist]
 include = ["test/"]
 
