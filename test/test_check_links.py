@@ -14,11 +14,11 @@ def test_ipynb(testdir):
 def test_markdown(testdir):
     testdir.copy_example("markdown.md")
     result = testdir.runpytest("-v", "--check-links")
-    result.assert_outcomes(passed=8, failed=4)
+    result.assert_outcomes(passed=7, failed=3)
     result = testdir.runpytest(
         "-v", "--check-links", "--check-links-ignore", "http.*example.com/.*"
     )
-    result.assert_outcomes(passed=8, failed=1)
+    result.assert_outcomes(passed=7, failed=1)
 
 
 def test_markdown_nested(testdir):
@@ -28,11 +28,11 @@ def test_markdown_nested(testdir):
     md.move(testdir.tmpdir / "nested" / "nested.md")
     testdir.copy_example("markdown.md")
     result = testdir.runpytest("-v", "--check-links")
-    result.assert_outcomes(passed=9, failed=4)
+    result.assert_outcomes(passed=8, failed=3)
     result = testdir.runpytest(
         "-v", "--check-links", "--check-links-ignore", "http.*example.com/.*"
     )
-    result.assert_outcomes(passed=9, failed=1)
+    result.assert_outcomes(passed=8, failed=1)
 
 
 @skip_pywin32

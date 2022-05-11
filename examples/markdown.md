@@ -16,9 +16,9 @@
 
 Or leave it empty and use the [link text itself].
 
-URLs and URLs in angle brackets will automatically get turned into links.
-http://www.example.com or <http://www.example.com> and sometimes
-example.com (but not on GitHub, for example). These will 404: http://example.com/404 <http://www.example.com/404>
+URLs in angle brackets will automatically get turned into links.
+<http://www.example.com> and sometimes
+example.com (but not on GitHub, for example). This will 404: <http://www.example.com/404>
 
 Some text to show that the reference links can follow later.
 
