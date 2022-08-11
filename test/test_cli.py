@@ -31,9 +31,9 @@ def test_cli_help():
         ["rst.rst", 1, [" 2 failed", " 7 passed"], [" warning"]],
     ],
 )
-def test_cli_pass(testdir, example, rc, expected, unexpected):
-    testdir.copy_example(example)
-    testdir.copy_example("setup.cfg")
+def test_cli_pass(pytester, example, rc, expected, unexpected):
+    pytester.copy_example(example)
+    pytester.copy_example("setup.cfg")
     output, _ = run(["pytest-check-links"], rc)
     assert output
     summary = output[-1]

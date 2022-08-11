@@ -47,8 +47,8 @@ content-type = "text/markdown"
 Homepage = "https://github.com/jupyterlab/pytest-check-links"
 
 [project.optional-dependencies]
-cache = ["requests-cache~=0.5.2"]
-test = ["requests-cache~=0.5.2", "pre-commit"]
+cache = ["requests-cache=>0.5.2"]
+test = ["requests-cache>=0.5.2", "pre-commit"]
 
 [project.scripts]
 pytest-check-links = "pytest_check_links.__main__:main"
