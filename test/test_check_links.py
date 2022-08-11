@@ -3,7 +3,7 @@ from .conftest import skip_pywin32
 
 def test_ipynb(pytester):
     pytester.copy_example("linkcheck.ipynb")
-    result = pytester.runpytest("-v", "--check-links")
+    result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
     result.assert_outcomes(passed=3, failed=4)
     result = pytester.runpytest(
         "-v", "--check-links", "--check-links-ignore", "http.*example.com/.*"
@@ -13,7 +13,7 @@ def test_ipynb(pytester):
 
 def test_markdown(pytester):
     pytester.copy_example("markdown.md")
-    result = pytester.runpytest("-v", "--check-links")
+    result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
     result.assert_outcomes(passed=7, failed=3)
     result = pytester.runpytest(
         "-v", "--check-links", "--check-links-ignore", "http.*example.com/.*"
@@ -27,7 +27,7 @@ def test_markdown_nested(pytester, tmpdir):
     md = tmpdir / "nested.md"
     md.move(tmpdir / "nested" / "nested.md")
     pytester.copy_example("markdown.md")
-    result = pytester.runpytest("-v", "--check-links")
+    result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
     result.assert_outcomes(passed=8, failed=3)
     result = pytester.runpytest(
         "-v", "--check-links", "--check-links-ignore", "http.*example.com/.*"
@@ -38,7 +38,7 @@ def test_markdown_nested(pytester, tmpdir):
 @skip_pywin32
 def test_rst(pytester):
     pytester.copy_example("rst.rst")
-    result = pytester.runpytest("-v", "--check-links")
+    result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
     result.assert_outcomes(passed=7, failed=2)
 
 
@@ -49,7 +49,7 @@ def test_rst_nested(pytester, tmpdir):
     rst = tmpdir / "nested.rst"
     rst.move(tmpdir / "nested" / "nested.rst")
     pytester.copy_example("rst.rst")
-    result = pytester.runpytest("-v", "--check-links")
+    result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
     result.assert_outcomes(passed=13, failed=5)
 
 
@@ -57,5 +57,5 @@ def test_link_ext(pytester):
     pytester.copy_example("linkcheck.ipynb")
     pytester.copy_example("rst.rst")
     pytester.copy_example("markdown.md")
-    result = pytester.runpytest("-v", "--check-links", "--links-ext=md,ipynb")
+    result = pytester.runpytest("-v", "--check-links", "--links-ext=md,ipynb", "-p", "pytest_check_links")
     result.assert_outcomes(passed=10, failed=7)
