@@ -10,7 +10,7 @@ import requests_cache
 
 def assert_sqlite(pytester, name=None, tmpdir=None, exists=True):
     name = name or ".pytest-check-links-cache.sqlite"
-    tmpdir = str(tmpdir)
+    tmpdir = str(tmpdir or pytester.path)
     caches = list(glob(os.path.join(tmpdir, name)))
     if exists:
         assert caches
