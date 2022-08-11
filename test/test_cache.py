@@ -129,8 +129,6 @@ def test_cache_backend_opts(pytester, base_args):
         "extension:.db",
         "--check-links-cache-backend-opt",
         "allowable_codes:[200]",
-        "-p",
-        "pytest_check_links",
     ]
     result = pytester.runpytest(*args)
     result.assert_outcomes(passed=6, failed=0)
