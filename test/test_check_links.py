@@ -57,5 +57,7 @@ def test_link_ext(pytester):
     pytester.copy_example("linkcheck.ipynb")
     pytester.copy_example("rst.rst")
     pytester.copy_example("markdown.md")
-    result = pytester.runpytest("-v", "--check-links", "--links-ext=md,ipynb", "-p", "pytest_check_links")
+    result = pytester.runpytest(
+        "-v", "--check-links", "--links-ext=md,ipynb", "-p", "pytest_check_links"
+    )
     result.assert_outcomes(passed=10, failed=7)
