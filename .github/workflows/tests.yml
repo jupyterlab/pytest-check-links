@@ -19,7 +19,7 @@ jobs:
           - os: windows-latest
             python-version: "3.9"
           - os: ubuntu-latest
-            python-version: "pypy-3.7"
+            python-version: "pypy-3.8"
           - os: macos-latest
             python-version: "3.8"
     steps:
@@ -100,7 +100,8 @@ jobs:
           pip check
       - name: Run the tests
         run: |
-          pytest -vv || pytest -vv --lf
+          args="-vv -p no:check-links"
+          pytest $args || pytest $args --lf
 
   make_sdist:
     name: Make SDist
