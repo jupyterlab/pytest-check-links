@@ -20,11 +20,12 @@ def assert_sqlite(pytester, name=None, tmpdir=None, exists=True):
 
 @pytest.mark.skipif(sys.implementation.name.lower() == "pypy", reason="Does not work on pypy")
 @pytest.mark.parametrize("cache_name", [None, "custom-cache"])
-def test_cache_expiry(pytester, base_args, cache_name, tmpdir):
+def test_cache_expiry(pytester, base_args, cache_name):
     """will the default sqlite3 backend persist and then expire?"""
     pytester.copy_example("linkcheck.ipynb")
 
     args = base_args + ["--check-links-cache-expire-after", "2"]
+    tmpdir = pytester.path
     if cache_name:
         args += ["--check-links-cache-name", os.path.join(str(tmpdir), cache_name)]
     expected = dict(passed=3, failed=4)
@@ -61,11 +62,12 @@ def test_cache_expiry(pytester, base_args, cache_name, tmpdir):
     assert d2 > d3, "cache did not expire"
 
 
-def test_cache_memory(pytester, tmpdir, memory_args):
+def test_cache_memory(pytester, memory_args):
     """will the memory backend cache links inside a run?"""
     expected = dict(passed=3, failed=0)
 
     pytester.copy_example("httpbin.md")
+    tmpdir = pytester.path
 
     def run(passed):
         t0 = time.time()

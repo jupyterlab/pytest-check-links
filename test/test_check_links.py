@@ -21,11 +21,11 @@ def test_markdown(pytester):
     result.assert_outcomes(passed=7, failed=1)
 
 
-def test_markdown_nested(pytester, tmpdir):
+def test_markdown_nested(pytester):
     pytester.copy_example("nested/nested.md")
-    tmpdir.mkdir("nested")
-    md = tmpdir / "nested.md"
-    md.move(tmpdir / "nested" / "nested.md")
+    nested = pytester.path.mkdir("nested")
+    md = nested / "nested.md"
+    md.move(nested / "nested" / "nested.md")
     pytester.copy_example("markdown.md")
     result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
     result.assert_outcomes(passed=8, failed=3)
@@ -43,11 +43,11 @@ def test_rst(pytester):
 
 
 @skip_pywin32
-def test_rst_nested(pytester, tmpdir):
+def test_rst_nested(pytester):
     pytester.copy_example("nested/nested.rst")
-    tmpdir.mkdir("nested")
-    rst = tmpdir / "nested.rst"
-    rst.move(tmpdir / "nested" / "nested.rst")
+    nested = pytester.path.mkdir("nested")
+    rst = nested / "nested.rst"
+    rst.move(nested / "nested" / "nested.rst")
     pytester.copy_example("rst.rst")
     result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
     result.assert_outcomes(passed=13, failed=5)
