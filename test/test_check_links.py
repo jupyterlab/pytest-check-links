@@ -28,6 +28,7 @@ def test_markdown_nested(pytester):
     nested = pytester.path.joinpath("nested")
     nested.mkdir()
     md = nested / "nested.md"
+    nested.joinpath("nested").mkdir()
     shutil.move(md, nested / "nested" / "nested.md")
     pytester.copy_example("markdown.md")
     result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
@@ -51,6 +52,7 @@ def test_rst_nested(pytester):
     nested = pytester.path.joinpath("nested")
     nested.mkdir()
     rst = nested / "nested.rst"
+    nested.joinpath("nested").mkdir()
     shutil.move(rst, nested / "nested" / "nested.rst")
     pytester.copy_example("rst.rst")
     result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
