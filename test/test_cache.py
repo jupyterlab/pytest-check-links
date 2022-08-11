@@ -10,7 +10,7 @@ import requests_cache
 
 def assert_sqlite(pytester, name=None, tmpdir=None, exists=True):
     name = name or ".pytest-check-links-cache.sqlite"
-    tmpdir = str(tmpdir or pytester.tmpdir)
+    tmpdir = str(tmpdir)
     caches = list(glob(os.path.join(tmpdir, name)))
     if exists:
         assert caches
@@ -61,7 +61,7 @@ def test_cache_expiry(pytester, base_args, cache_name, tmpdir):
     assert d2 > d3, "cache did not expire"
 
 
-def test_cache_memory(pytester, memory_args):
+def test_cache_memory(pytester, tmpdir, memory_args):
     """will the memory backend cache links inside a run?"""
     expected = dict(passed=3, failed=0)
 
@@ -79,8 +79,8 @@ def test_cache_memory(pytester, memory_args):
 
     for i in range(5):
         shutil.copy(
-            os.path.join(str(pytester.tmpdir), "httpbin.md"),
-            os.path.join(str(pytester.tmpdir), f"httpbin{i}.md"),
+            os.path.join(str(tmpdir), "httpbin.md"),
+            os.path.join(str(tmpdir), f"httpbin{i}.md"),
         )
 
     d1 = run(36)
