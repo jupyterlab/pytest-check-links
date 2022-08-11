@@ -13,7 +13,7 @@ def assert_sqlite(pytester, name=None, tmpdir=None, exists=True):
     tmpdir = str(tmpdir or pytester.path)
     caches = list(glob(os.path.join(tmpdir, name)))
     if exists:
-        assert caches
+        assert caches, os.listdir(tmpdir)
     else:
         assert not caches
 
