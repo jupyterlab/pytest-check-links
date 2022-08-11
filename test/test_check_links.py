@@ -1,3 +1,5 @@
+import shutil
+
 from .conftest import skip_pywin32
 
 
@@ -26,7 +28,7 @@ def test_markdown_nested(pytester):
     nested = pytester.path.joinpath("nested")
     nested.mkdir()
     md = nested / "nested.md"
-    md.move(nested / "nested" / "nested.md")
+    shutil.move(md, nested / "nested" / "nested.md")
     pytester.copy_example("markdown.md")
     result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
     result.assert_outcomes(passed=8, failed=3)
@@ -49,7 +51,7 @@ def test_rst_nested(pytester):
     nested = pytester.path.joinpath("nested")
     nested.mkdir()
     rst = nested / "nested.rst"
-    rst.move(nested / "nested" / "nested.rst")
+    shutil.move(rst, nested / "nested" / "nested.rst")
     pytester.copy_example("rst.rst")
     result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
     result.assert_outcomes(passed=13, failed=5)
