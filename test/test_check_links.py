@@ -27,9 +27,8 @@ def test_markdown_nested(pytester):
     pytester.copy_example("nested/nested.md")
     nested = pytester.path.joinpath("nested")
     nested.mkdir()
-    md = nested / "nested.md"
-    nested.joinpath("nested").mkdir()
-    shutil.move(md, nested / "nested" / "nested.md")
+    shutil.move(pytester.path / "nested.md", nested / "nested.md")
+    pytester.copy_example("rst.rst")
     pytester.copy_example("markdown.md")
     result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
     result.assert_outcomes(passed=8, failed=3)
@@ -51,9 +50,7 @@ def test_rst_nested(pytester):
     pytester.copy_example("nested/nested.rst")
     nested = pytester.path.joinpath("nested")
     nested.mkdir()
-    rst = nested / "nested.rst"
-    nested.joinpath("nested").mkdir()
-    shutil.move(rst, nested / "nested" / "nested.rst")
+    shutil.move(pytester.path / "nested.rst", nested / "nested.rst")
     pytester.copy_example("rst.rst")
     result = pytester.runpytest("-v", "--check-links", "-p", "pytest_check_links")
     result.assert_outcomes(passed=13, failed=5)
