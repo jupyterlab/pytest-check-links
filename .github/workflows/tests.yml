@@ -101,7 +101,7 @@ jobs:
       - name: Run the tests
         run: |
           args="-vv -p no:check-links"
-          pytest $args || pytest $args --lf
+          python -m pytest $args || python -m pytest $args --lf
 
   make_sdist:
     name: Make SDist
