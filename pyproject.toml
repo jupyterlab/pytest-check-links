@@ -33,6 +33,7 @@ dependencies = [
   "nbformat",
   "pytest >= 7.0",
   "requests",
+  "mistune < 1"
 ]
 
 [[project.authors]]
