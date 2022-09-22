@@ -62,9 +62,6 @@ path = "pytest_check_links/_version.py"
 [tool.jupyter-releaser]
 skip = ["check-links"]
 
-[tool.jupyter-releaser.options]
-ignore-glob = ["examples/**/*.*"]
-
 [tool.pytest.ini_options]
 addopts = "-raXs --durations 10 --color=yes --doctest-modules"
 filterwarnings = [
