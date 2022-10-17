@@ -16,11 +16,15 @@ pytest plugin that checks URLs for HTML-containing files.
 
 ## Install
 
-    pip install pytest-check-links
+```
+pip install pytest-check-links
+```
 
 ## Use
 
-    pytest --check-links mynotebook.ipynb
+```
+pytest --check-links mynotebook.ipynb
+```
 
 ## Configure
 
@@ -43,13 +47,17 @@ Can be specified multiple times for multiple ignore patterns.
 This can be used for files that have a lot of links to GitHub pages,
 such as a Changelog. GitHub has rate limiting, which would normally cause these files to take up to an hour to complete for larger repositories. For example:
 
-    pytest --check-links --check-links-ignore "https://github.com/.*/pull/.*" CHANGELOG.md
+```
+pytest --check-links --check-links-ignore "https://github.com/.*/pull/.*" CHANGELOG.md
+```
 
 ### Cache
 
 Caching requires the installation of `requests-cache`.
 
-    pip install requests-cache
+```
+pip install requests-cache
+```
 
 If enabled, each occurance of a link will be checked, no matter how many times
 it appears in a collection of files to check.
