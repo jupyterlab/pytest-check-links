@@ -27,7 +27,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - run: hatch run cov:test
+      - name: Run the tests
+        timeout-minutes: 15
+        if: ${{ !startsWith( matrix.python-version, 'pypy' ) && !startsWith(matrix.os, 'windows') }}
+        run: |
+          hatch run cov:test || hatch run test:test --lf
+      - name: Run the tests on pypy and windows
+        timeout-minutes: 15
+        if: ${{ startsWith( matrix.python-version, 'pypy' ) || startsWith(matrix.os, 'windows') }}
+        run: |
+          hatch run test:test -s || hatch run test:test -s --lf
       - name: Upload coverage
         run: |
           pip install codecov
