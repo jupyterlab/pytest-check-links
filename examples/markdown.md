@@ -22,6 +22,6 @@ example.com (but not on GitHub, for example). This will 404: <http://www.example
 
 Some text to show that the reference links can follow later.
 
-[arbitrary case-insensitive reference text]: https://www.mozilla.org
 [1]: http://slashdot.org
+[arbitrary case-insensitive reference text]: https://www.mozilla.org
 [link text itself]: https://www.w3.org
