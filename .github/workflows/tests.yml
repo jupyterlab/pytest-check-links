@@ -2,7 +2,7 @@ name: Tests
 
 on:
   push:
-    branches: [master]
+    branches: ["main"]
   pull_request:
   schedule:
     - cron: "0 8 * * *"
@@ -20,51 +20,33 @@ jobs:
             python-version: "3.9"
           - os: ubuntu-latest
             python-version: "pypy-3.7"
+          - os: ubuntu-latest
+            python-version: "3.11-dev"
           - os: macos-latest
             python-version: "3.8"
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - name: Install package and dependencies
-        run: |
-          pip install -vv .[test] pytest-cov codecov
-      - name: Show python environment
-        run: |
-          which python
-          python --version
-          python -m pip check
-          python -m pip list
-      - name: Run python tests
-        # disable automatic inclusion for coverage
-        shell: bash
-        run: |
-          args="-vv -p no:check-links --cov pytest_check_links --cov-report term-missing"
-          python -m pytest $args || python -m pytest $args --lf
+      - run: hatch run cov:test
       - name: Upload coverage
         run: |
+          pip install codecov
           codecov
 
-  # Run "pre-commit run --all-files --hook-stage=manual"
   pre-commit:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v2
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - uses: pre-commit/action@v2.0.0
-        with:
-          extra_args: --all-files --hook-stage=manual
-      - name: Help message if pre-commit fail
-        if: ${{ failure() }}
-        run: |
-          echo "You can install pre-commit hooks to automatically run formatting"
-          echo "on each commit with:"
-          echo "    pre-commit install"
-          echo "or you can run by hand on staged files with"
-          echo "    pre-commit run"
-          echo "or after-the-fact on already committed files with"
-          echo "    pre-commit run --all-files --hook-stage=manual"
+      - uses: jupyterlab/maintainer-tools/.github/actions/pre-commit@v1
+
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/pre-commit@v1
 
   test_minimum_versions:
     name: Test Minimum Versions
