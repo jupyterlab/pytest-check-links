@@ -320,11 +320,7 @@ class LinkItem(pytest.Item):  # type:ignore[misc]
         try:
             response = session.get(url_no_anchor)
         except Exception as err:
-            if (
-                hasattr(err, "headers")
-                and retries
-                and self.sleep(err.headers)
-            ):
+            if hasattr(err, "headers") and retries and self.sleep(err.headers):
                 self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
 
