@@ -323,7 +323,7 @@ class LinkItem(pytest.Item):  # type:ignore[misc]
             if (
                 hasattr(err, "headers")
                 and retries
-                and self.sleep(err.headers)  # type:ignore[attr-defined]
+                and self.sleep(err.headers)
             ):
                 self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
