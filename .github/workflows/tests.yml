@@ -40,14 +40,6 @@ jobs:
           pip install codecov
           codecov
 
-  test_docs:
-    name: Test Docs
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - run: hatch run docs:build
-
   pre_commit:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -136,7 +128,6 @@ jobs:
     needs:
       - build
       - pre_commit
-      - test_docs
       - test_minimum_versions
       - test_prereleases
       - check_links
