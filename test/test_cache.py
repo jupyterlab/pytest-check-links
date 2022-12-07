@@ -5,7 +5,7 @@ import time
 from glob import glob
 
 import pytest
-import requests_cache
+import requests_cache  # type:ignore
 
 
 def assert_sqlite(testdir, name=None, tmpdir=None, exists=True):
@@ -27,7 +27,7 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
     args = base_args + ["--check-links-cache-expire-after", "2"]
     if cache_name:
         args += ["--check-links-cache-name", os.path.join(str(tmpdir), cache_name)]
-    expected = dict(passed=3, failed=4)
+    expected = {"passed": 3, "failed": 4}
     t0 = time.time()
     result = testdir.runpytest(*args)
     t1 = time.time()
@@ -63,7 +63,7 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
 
 def test_cache_memory(testdir, memory_args):
     """will the memory backend cache links inside a run?"""
-    expected = dict(passed=3, failed=0)
+    expected = dict(passed=3, failed=0)  # noqa
 
     testdir.copy_example("httpbin.md")
 

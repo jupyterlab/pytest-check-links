@@ -17,12 +17,12 @@ _ENC = "utf8"
 default_extensions = {".md", ".rst", ".html", ".ipynb"}
 supported_extensions = {".md", ".rst", ".html", ".ipynb"}
 
-default_cache = dict(
-    cache_name=".pytest-check-links-cache",
-    backend=None,
-    expire_after=None,
-    allowable_codes=list(range(200, 512)),
-)
+default_cache = {
+    "cache_name": ".pytest-check-links-cache",
+    "backend": None,
+    "expire_after": None,
+    "allowable_codes": list(range(200, 512)),
+}
 
 
 def pytest_addoption(parser):
@@ -102,7 +102,7 @@ def ensure_requests_session(config):
 
     if not hasattr(config.option, session_attr):
         if config.option.check_links_cache:
-            from requests_cache import CachedSession
+            from requests_cache import CachedSession  # type:ignore
 
             conf_kwargs = getattr(config.option, "check_links_cache_kwargs", {})
             kwargs = dict(default_cache)
@@ -120,7 +120,7 @@ def ensure_requests_session(config):
     return getattr(config.option, session_attr)
 
 
-class CheckLinks(pytest.File):  # type:ignore[misc]
+class CheckLinks(pytest.File):
     """Check the links in a file"""
 
     def __init__(self, *, requests_session=None, check_anchors=False, ignore_links=None, **kwargs):
@@ -243,7 +243,7 @@ def links_in_html(base_name, parent, html):
                 yield LinkItem(name=name, parent=parent, target=url, parsed=parsed)
 
 
-class LinkItem(pytest.Item):  # type:ignore[misc]
+class LinkItem(pytest.Item):
 
     """Test item for an HTML link
 
@@ -324,7 +324,7 @@ class LinkItem(pytest.Item):  # type:ignore[misc]
                 self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
 
-            raise BrokenLinkError(url, "%s" % err)
+            raise BrokenLinkError(url, "%s" % err) from err
 
         if response.status_code >= 400:
             if retries and self.sleep(response.headers):
@@ -343,7 +343,7 @@ class LinkItem(pytest.Item):  # type:ignore[misc]
             if session.cache is None:
                 raise ValueError("No session cache found")
             key = session.cache.create_key(request)
-            if session.cache.has_key(key):  # noqa
+            if session.cache.has_key(key):
                 session.cache.delete(key)
                 uncached = True
         return uncached
