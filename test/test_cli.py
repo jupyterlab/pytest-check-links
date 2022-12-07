@@ -9,8 +9,6 @@ def run(cmd, rc=0):
     stdout, stderr = proc.communicate()
     output = stdout.decode("utf-8").strip().splitlines()
     err = stderr.decode("utf-8").strip().splitlines()
-    print(output)
-    print(err)
     assert rc == proc.returncode
     return output, err
 
