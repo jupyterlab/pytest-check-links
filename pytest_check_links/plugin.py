@@ -1,3 +1,4 @@
+"""pytest-check-links plugin."""
 import os
 import re
 import time
@@ -26,6 +27,7 @@ default_cache = {
 
 
 def pytest_addoption(parser):
+    """Add options to pytest."""
     group = parser.getgroup("general")
     group.addoption("--check-links", action="store_true", help="Check links for validity")
     group.addoption("--check-anchors", action="store_true", help="Check link anchors for validity")
@@ -67,11 +69,13 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
+    """Configure pytest."""
     if config.option.links_ext:
         validate_extensions(config.option.links_ext)
 
 
 def pytest_collect_file(path, parent):
+    """Add pytest file collection filter."""
     config = parent.config
     ignore_links = config.option.check_links_ignore
     if config.option.check_links:
@@ -124,12 +128,14 @@ class CheckLinks(pytest.File):
     """Check the links in a file"""
 
     def __init__(self, *, requests_session=None, check_anchors=False, ignore_links=None, **kwargs):
+        """Initialize."""
         super().__init__(**kwargs)
         self.check_anchors = check_anchors
         self.requests_session = requests_session
         self.ignore_links = ignore_links or []
 
     def teardown(self):
+        """Teardown the handler."""
         self.requests_session.close()
 
     def _html_from_html(self):
@@ -175,6 +181,7 @@ class CheckLinks(pytest.File):
                     yield item
 
     def collect(self):
+        """Collect the test."""
         path = self.path
         if path.suffix == ".ipynb":
             for item in self._items_from_notebook():
@@ -198,11 +205,15 @@ class CheckLinks(pytest.File):
 
 
 class BrokenLinkError(Exception):
+    """A broken link error."""
+
     def __init__(self, url, error):
+        """Initialize the error."""
         self.url = url
         self.error = error
 
     def __repr__(self):
+        """The repr for the error."""
         return f"<{self.__class__.__name__} url={self.url}, error={self.error}>"
 
 
@@ -258,12 +269,14 @@ class LinkItem(pytest.Item):
     parent: CheckLinks
 
     def __init__(self, name=None, parent=None, target=None, parsed=None, description="", **kwargs):
+        """Initialize the item."""
         super().__init__(name, parent, **kwargs)
         self.target = target
         self.parsed = parsed
         self.description = description or f"{self.path}: {target}"
 
     def repr_failure(self, excinfo):
+        """Repr for a failure."""
         exc = excinfo.value
         if isinstance(exc, BrokenLinkError):
             return f"{exc.url}: {exc.error}"
@@ -271,6 +284,7 @@ class LinkItem(pytest.Item):
             return super().repr_failure(excinfo)
 
     def reportinfo(self):
+        """Get the report information."""
         return self.path, 0, self.description
 
     def sleep(self, headers):
@@ -336,6 +350,7 @@ class LinkItem(pytest.Item):
         return response
 
     def uncache_url(self, url):
+        """Uncache a url."""
         uncached = False
         session = self.parent.requests_session
         if hasattr(session, "cache"):
@@ -349,6 +364,7 @@ class LinkItem(pytest.Item):
         return uncached
 
     def runtest(self):
+        """Run the test."""
         url = self.target or ""
 
         if ":" in url:
@@ -393,6 +409,7 @@ class LinkItem(pytest.Item):
 
 
 def extensions_str(extensions):
+    """Get the extensions as a string."""
     if not extensions:
         return ""
     extensions = ['"%s"' % e.lstrip(".") for e in extensions if e]
@@ -402,6 +419,7 @@ def extensions_str(extensions):
 
 
 def validate_extensions(extensions):
+    """Validate the extensions."""
     invalid = set(extensions) - supported_extensions
     if invalid:
         warnings.warn("Unsupported extensions for check-links: %s" % extensions_str(invalid))

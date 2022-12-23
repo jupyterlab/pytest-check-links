@@ -13,7 +13,7 @@ import sys
 
 
 def main(args=None):
-
+    """Main function."""
     if args is None:
         args = sys.argv[1:]
 
