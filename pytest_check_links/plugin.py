@@ -103,7 +103,6 @@ def pytest_collect_file(path, parent):
 def ensure_requests_session(config):
     """Build the singleton requests.Session (or subclass)"""
     session_attr = "check_links_requests_session"
-
     if not hasattr(config.option, session_attr):
         if config.option.check_links_cache:
             from requests_cache import CachedSession  # type:ignore
@@ -111,6 +110,9 @@ def ensure_requests_session(config):
             conf_kwargs = getattr(config.option, "check_links_cache_kwargs", {})
             kwargs = dict(default_cache)
             kwargs.update(conf_kwargs)
+            kwargs['backend'] = 'sqlite'
+
+            # aise ValueError(json.dumps(kwargs))
             requests_session = CachedSession(**kwargs)
             if kwargs.get("expire_after"):
                 requests_session.remove_expired_responses()
