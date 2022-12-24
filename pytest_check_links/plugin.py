@@ -350,14 +350,19 @@ class LinkItem(pytest.Item):
 
     def uncache_url(self, url):
         """Uncache a url."""
+        from requests_cache import BaseCache
+
         uncached = False
         session = self.parent.requests_session
+        if session is None:
+            raise ValueError('No current session')
         if hasattr(session, "cache"):
             request = Request("GET", url, headers=session.headers).prepare()
             if session.cache is None:
                 raise ValueError("No session cache found")
-            key = session.cache.create_key(request)
-            if session.cache.has_key(key):
+            cache: BaseCache = session.cache
+            key = cache.create_key(request)
+            if cache.contains(key):
                 session.cache.delete(key)
                 uncached = True
         return uncached
