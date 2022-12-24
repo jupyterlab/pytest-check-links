@@ -105,19 +105,16 @@ def ensure_requests_session(config):
     session_attr = "check_links_requests_session"
     if not hasattr(config.option, session_attr):
         if config.option.check_links_cache:
-            from requests_cache import CachedSession  # type:ignore
+            from requests_cache import CachedSession
 
             conf_kwargs = getattr(config.option, "check_links_cache_kwargs", {})
             kwargs = dict(default_cache)
             kwargs.update(conf_kwargs)
-            kwargs['backend'] = 'sqlite'
-
-            # aise ValueError(json.dumps(kwargs))
-            requests_session = CachedSession(**kwargs)
+            requests_session = CachedSession(**kwargs)  # type:ignore[arg-type]
             if kwargs.get("expire_after"):
                 requests_session.remove_expired_responses()
         else:
-            requests_session = Session()
+            requests_session = Session()  # type:ignore
 
         requests_session.headers["User-Agent"] = "pytest-check-links"
 

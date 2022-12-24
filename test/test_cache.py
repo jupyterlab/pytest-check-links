@@ -5,7 +5,7 @@ import time
 from glob import glob
 
 import pytest
-import requests_cache  # type:ignore
+import requests_cache
 
 
 def assert_sqlite(testdir, name=None, tmpdir=None, exists=True):
@@ -105,7 +105,7 @@ def test_cache_retry(testdir, memory_args):
         attempts.append([args, kwargs])
         return response
 
-    requests_cache.CachedSession.get = mock_get
+    requests_cache.CachedSession.get = mock_get  # type:ignore
 
     result = testdir.runpytest(*memory_args)
 
@@ -113,7 +113,7 @@ def test_cache_retry(testdir, memory_args):
         result.assert_outcomes(passed=5, failed=1)
         assert len(attempts) == 10
     finally:
-        requests_cache.CachedSession.get = _get
+        requests_cache.CachedSession.get = _get  # type:ignore
 
 
 def test_cache_backend_opts(testdir, base_args):
