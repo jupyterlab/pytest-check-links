@@ -103,19 +103,18 @@ def pytest_collect_file(path, parent):
 def ensure_requests_session(config):
     """Build the singleton requests.Session (or subclass)"""
     session_attr = "check_links_requests_session"
-
     if not hasattr(config.option, session_attr):
         if config.option.check_links_cache:
-            from requests_cache import CachedSession  # type:ignore
+            from requests_cache import CachedSession
 
             conf_kwargs = getattr(config.option, "check_links_cache_kwargs", {})
             kwargs = dict(default_cache)
             kwargs.update(conf_kwargs)
-            requests_session = CachedSession(**kwargs)
+            requests_session = CachedSession(**kwargs)  # type:ignore[arg-type]
             if kwargs.get("expire_after"):
                 requests_session.remove_expired_responses()
         else:
-            requests_session = Session()
+            requests_session = Session()  # type:ignore
 
         requests_session.headers["User-Agent"] = "pytest-check-links"
 
@@ -351,14 +350,19 @@ class LinkItem(pytest.Item):
 
     def uncache_url(self, url):
         """Uncache a url."""
+        from requests_cache import BaseCache
+
         uncached = False
         session = self.parent.requests_session
+        if session is None:
+            raise ValueError('No current session')
         if hasattr(session, "cache"):
             request = Request("GET", url, headers=session.headers).prepare()
             if session.cache is None:
                 raise ValueError("No session cache found")
-            key = session.cache.create_key(request)
-            if session.cache.has_key(key):
+            cache: BaseCache = session.cache
+            key = cache.create_key(request)
+            if cache.contains(key):
                 session.cache.delete(key)
                 uncached = True
         return uncached
