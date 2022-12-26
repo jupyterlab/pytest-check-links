@@ -2,6 +2,24 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.8.0
+
+([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.7.1...dafddb42b22f480303a76bb46a7042e360c2379a))
+
+### Maintenance and upkeep improvements
+
+- Update for newer requests-cache [#98](https://github.com/jupyterlab/pytest-check-links/pull/98) ([@blink1073](https://github.com/blink1073))
+- Add docstring enforcement [#97](https://github.com/jupyterlab/pytest-check-links/pull/97) ([@blink1073](https://github.com/blink1073))
+- Add releaser workflows [#96](https://github.com/jupyterlab/pytest-check-links/pull/96) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2022-04-07&to=2022-12-26&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2022-04-07..2022-12-26&type=Issues) | [@bollwyvl](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Abollwyvl+updated%3A2022-04-07..2022-12-26&type=Issues) | [@codecov](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Acodecov+updated%3A2022-04-07..2022-12-26&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Awelcome+updated%3A2022-04-07..2022-12-26&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.7.1
 
 ([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.7.0...17cf01b96afe0f933b476fd2882009db440e805d))
@@ -15,8 +33,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2022-04-07&to=2022-04-07&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2022-04-07..2022-04-07&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.7.0
 
