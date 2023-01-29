@@ -24,7 +24,7 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
     """will the default sqlite3 backend persist and then expire?"""
     testdir.copy_example("linkcheck.ipynb")
 
-    args = base_args + ["--check-links-cache-expire-after", "2"]
+    args = [*base_args, "--check-links-cache-expire-after", "2"]
     if cache_name:
         args += ["--check-links-cache-name", os.path.join(str(tmpdir), cache_name)]
     expected = {"passed": 3, "failed": 4}
@@ -99,7 +99,7 @@ def test_cache_retry(testdir, memory_args):
 
     def mock_get(*args, **kwargs):
         response = _get(*args, **kwargs)
-        if len(attempts) < 5:
+        if len(attempts) < 5:  # noqa
             response.status_code = 502
             response.headers["Retry-After"] = "0"
         attempts.append([args, kwargs])
@@ -111,14 +111,15 @@ def test_cache_retry(testdir, memory_args):
 
     try:
         result.assert_outcomes(passed=5, failed=1)
-        assert len(attempts) == 10
+        assert len(attempts) == 10  # noqa
     finally:
         requests_cache.CachedSession.get = _get  # type:ignore
 
 
 def test_cache_backend_opts(testdir, base_args):
     testdir.copy_example("httpbin.md")
-    args = base_args + [
+    args = [
+        *base_args,
         "--check-links-cache-backend-opt",
         "fast_save:true",
         "--check-links-cache-name",
