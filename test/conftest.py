@@ -19,4 +19,4 @@ def base_args():
 
 @pytest.fixture
 def memory_args(base_args):
-    return base_args + ["--check-links-cache-backend", "memory"]
+    return [*base_args, "--check-links-cache-backend", "memory"]

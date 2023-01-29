@@ -18,7 +18,7 @@ def main(args=None):
         args = sys.argv[1:]
 
     return subprocess.call(
-        [sys.executable, "-m", "pytest", "--check-links", "-p", "no:python"] + args
+        [sys.executable, "-m", "pytest", "--check-links", "-p", "no:python", *args]
     )
 
 

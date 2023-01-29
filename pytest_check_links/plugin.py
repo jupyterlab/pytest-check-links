@@ -339,7 +339,7 @@ class LinkItem(pytest.Item):
 
             raise BrokenLinkError(url, "%s" % err) from err
 
-        if response.status_code >= 400:
+        if response.status_code >= 400:  # noqa
             if retries and self.sleep(response.headers):
                 self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
@@ -355,11 +355,13 @@ class LinkItem(pytest.Item):
         uncached = False
         session = self.parent.requests_session
         if session is None:
-            raise ValueError('No current session')
+            msg = 'No current session'
+            raise ValueError(msg)
         if hasattr(session, "cache"):
             request = Request("GET", url, headers=session.headers).prepare()
             if session.cache is None:
-                raise ValueError("No session cache found")
+                msg = "No session cache found"
+                raise ValueError(msg)
             cache: BaseCache = session.cache
             key = cache.create_key(request)
             if cache.contains(key):
@@ -367,7 +369,7 @@ class LinkItem(pytest.Item):
                 uncached = True
         return uncached
 
-    def runtest(self):
+    def runtest(self):  # noqa
         """Run the test."""
         url = self.target or ""
 
