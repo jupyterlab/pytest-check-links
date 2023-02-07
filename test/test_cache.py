@@ -63,7 +63,7 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
 
 def test_cache_memory(testdir, memory_args):
     """will the memory backend cache links inside a run?"""
-    expected = dict(passed=3, failed=0)  # noqa
+    expected = dict(passed=3, failed=0)
 
     testdir.copy_example("httpbin.md")
 
