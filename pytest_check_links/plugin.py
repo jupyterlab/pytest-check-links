@@ -267,7 +267,9 @@ class LinkItem(pytest.Item):
 
     parent: CheckLinks
 
-    def __init__(self, name=None, parent=None, target=None, parsed=None, description="", **kwargs):  # noqa
+    def __init__(
+        self, name=None, parent=None, target=None, parsed=None, description="", **kwargs
+    ):  # noqa
         """Initialize the item."""
         super().__init__(name, parent, **kwargs)
         self.target = target
