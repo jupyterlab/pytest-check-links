@@ -371,7 +371,7 @@ class LinkItem(pytest.Item):
                 uncached = True
         return uncached
 
-    def runtest(self):  # noqa
+    def runtest(self):
         """Run the test."""
         url = self.target or ""
 
