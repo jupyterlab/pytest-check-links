@@ -8,9 +8,9 @@ import pytest
 import requests_cache
 
 
-def assert_sqlite(testdir, name=None, tmpdir=None, exists=True):
+def assert_sqlite(pytester, name=None, tmpdir=None, exists=True):
     name = name or ".pytest-check-links-cache.sqlite"
-    tmpdir = str(tmpdir or testdir.tmpdir)
+    tmpdir = str(tmpdir or pytester.path)
     caches = list(glob(os.path.join(tmpdir, name)))
     if exists:
         assert caches
@@ -20,26 +20,26 @@ def assert_sqlite(testdir, name=None, tmpdir=None, exists=True):
 
 @pytest.mark.skipif(sys.implementation.name.lower() == "pypy", reason="Does not work on pypy")
 @pytest.mark.parametrize("cache_name", [None, "custom-cache"])
-def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
+def test_cache_expiry(pytester, base_args, cache_name, tmpdir):
     """will the default sqlite3 backend persist and then expire?"""
-    testdir.copy_example("linkcheck.ipynb")
+    pytester.copy_example("linkcheck.ipynb")
 
     args = [*base_args, "--check-links-cache-expire-after", "2"]
     if cache_name:
         args += ["--check-links-cache-name", os.path.join(str(tmpdir), cache_name)]
     expected = {"passed": 3, "failed": 4}
     t0 = time.time()
-    result = testdir.runpytest(*args)
+    result = pytester.runpytest(*args)
     t1 = time.time()
     result.assert_outcomes(**expected)
 
     if cache_name:
-        assert_sqlite(testdir, name=f"{cache_name}.sqlite", tmpdir=tmpdir)
+        assert_sqlite(pytester, name=f"{cache_name}.sqlite", tmpdir=tmpdir)
     else:
-        assert_sqlite(testdir)
+        assert_sqlite(pytester)
 
     t2 = time.time()
-    result = testdir.runpytest(*args)
+    result = pytester.runpytest(*args)
     t3 = time.time()
     result.assert_outcomes(**expected)
 
@@ -51,7 +51,7 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
     time.sleep(2)
 
     t4 = time.time()
-    result = testdir.runpytest(*args)
+    result = pytester.runpytest(*args)
     t5 = time.time()
     result.assert_outcomes(**expected)
 
@@ -61,26 +61,26 @@ def test_cache_expiry(testdir, base_args, cache_name, tmpdir):
     assert d2 > d3, "cache did not expire"
 
 
-def test_cache_memory(testdir, memory_args):
+def test_cache_memory(pytester, memory_args):
     """will the memory backend cache links inside a run?"""
     expected = dict(passed=3, failed=0)
 
-    testdir.copy_example("httpbin.md")
+    pytester.copy_example("httpbin.md")
 
     def run(passed):
         t0 = time.time()
-        result = testdir.runpytest(*memory_args)
+        result = pytester.runpytest(*memory_args)
         t1 = time.time()
         result.assert_outcomes(passed=passed, failed=0)
-        assert_sqlite(testdir, exists=False)
+        assert_sqlite(pytester, exists=False)
         return t1 - t0
 
     d0 = run(6)
 
     for i in range(5):
         shutil.copy(
-            os.path.join(str(testdir.tmpdir), "httpbin.md"),
-            os.path.join(str(testdir.tmpdir), f"httpbin{i}.md"),
+            os.path.join(str(pytester.path), "httpbin.md"),
+            os.path.join(str(pytester.path), f"httpbin{i}.md"),
         )
 
     d1 = run(36)
@@ -88,10 +88,10 @@ def test_cache_memory(testdir, memory_args):
     assert d1 < d0 * 4
 
 
-def test_cache_retry(testdir, memory_args):
+def test_cache_retry(pytester, memory_args):
     """will a Retry-After header work with cache?"""
 
-    testdir.copy_example("httpbin.md")
+    pytester.copy_example("httpbin.md")
 
     attempts: list = []
 
@@ -107,7 +107,7 @@ def test_cache_retry(testdir, memory_args):
 
     requests_cache.CachedSession.get = mock_get  # type:ignore
 
-    result = testdir.runpytest(*memory_args)
+    result = pytester.runpytest(*memory_args)
 
     try:
         result.assert_outcomes(passed=5, failed=1)
@@ -116,8 +116,8 @@ def test_cache_retry(testdir, memory_args):
         requests_cache.CachedSession.get = _get  # type:ignore
 
 
-def test_cache_backend_opts(testdir, base_args):
-    testdir.copy_example("httpbin.md")
+def test_cache_backend_opts(pytester, base_args):
+    pytester.copy_example("httpbin.md")
     args = [
         *base_args,
         "--check-links-cache-backend-opt",
@@ -125,6 +125,6 @@ def test_cache_backend_opts(testdir, base_args):
         "--check-links-cache-name",
         "foo",
     ]
-    result = testdir.runpytest(*args)
+    result = pytester.runpytest(*args)
     result.assert_outcomes(passed=6, failed=0)
-    assert_sqlite(testdir, name="foo.sqlite")
+    assert_sqlite(pytester, name="foo.sqlite")

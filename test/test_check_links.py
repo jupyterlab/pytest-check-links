@@ -1,61 +1,63 @@
+import shutil
+
 from .conftest import skip_pywin32
 
 
-def test_ipynb(testdir):
-    testdir.copy_example("linkcheck.ipynb")
-    result = testdir.runpytest("-v", "--check-links")
+def test_ipynb(pytester):
+    pytester.copy_example("linkcheck.ipynb")
+    result = pytester.runpytest("-v", "--check-links")
     result.assert_outcomes(passed=3, failed=4)
-    result = testdir.runpytest(
+    result = pytester.runpytest(
         "-v", "--check-links", "--check-links-ignore", "http.*example.com/.*"
     )
     result.assert_outcomes(passed=3, failed=3)
 
 
-def test_markdown(testdir):
-    testdir.copy_example("markdown.md")
-    result = testdir.runpytest("-v", "--check-links")
+def test_markdown(pytester):
+    pytester.copy_example("markdown.md")
+    result = pytester.runpytest("-v", "--check-links")
     result.assert_outcomes(passed=7, failed=3)
-    result = testdir.runpytest(
+    result = pytester.runpytest(
         "-v", "--check-links", "--check-links-ignore", "http.*example.com/.*"
     )
     result.assert_outcomes(passed=7, failed=1)
 
 
-def test_markdown_nested(testdir):
-    testdir.copy_example("nested/nested.md")
-    testdir.mkdir("nested")
-    md = testdir.tmpdir / "nested.md"
-    md.move(testdir.tmpdir / "nested" / "nested.md")
-    testdir.copy_example("markdown.md")
-    result = testdir.runpytest("-v", "--check-links")
+def test_markdown_nested(pytester):
+    pytester.copy_example("nested/nested.md")
+    pytester.mkdir("nested")
+    md = pytester.path / "nested.md"
+    shutil.move(md, pytester.path / "nested" / "nested.md")
+    pytester.copy_example("markdown.md")
+    result = pytester.runpytest("-v", "--check-links")
     result.assert_outcomes(passed=8, failed=3)
-    result = testdir.runpytest(
+    result = pytester.runpytest(
         "-v", "--check-links", "--check-links-ignore", "http.*example.com/.*"
     )
     result.assert_outcomes(passed=8, failed=1)
 
 
 @skip_pywin32
-def test_rst(testdir):
-    testdir.copy_example("rst.rst")
-    result = testdir.runpytest("-v", "--check-links")
+def test_rst(pytester):
+    pytester.copy_example("rst.rst")
+    result = pytester.runpytest("-v", "--check-links")
     result.assert_outcomes(passed=7, failed=2)
 
 
 @skip_pywin32
-def test_rst_nested(testdir):
-    testdir.copy_example("nested/nested.rst")
-    testdir.mkdir("nested")
-    rst = testdir.tmpdir / "nested.rst"
-    rst.move(testdir.tmpdir / "nested" / "nested.rst")
-    testdir.copy_example("rst.rst")
-    result = testdir.runpytest("-v", "--check-links")
+def test_rst_nested(pytester):
+    pytester.copy_example("nested/nested.rst")
+    pytester.mkdir("nested")
+    rst = pytester.path / "nested.rst"
+    shutil.move(rst, pytester.path / "nested" / "nested.rst")
+    pytester.copy_example("rst.rst")
+    result = pytester.runpytest("-v", "--check-links")
     result.assert_outcomes(passed=13, failed=5)
 
 
-def test_link_ext(testdir):
-    testdir.copy_example("linkcheck.ipynb")
-    testdir.copy_example("rst.rst")
-    testdir.copy_example("markdown.md")
-    result = testdir.runpytest("-v", "--check-links", "--links-ext=md,ipynb")
+def test_link_ext(pytester):
+    pytester.copy_example("linkcheck.ipynb")
+    pytester.copy_example("rst.rst")
+    pytester.copy_example("markdown.md")
+    result = pytester.runpytest("-v", "--check-links", "--links-ext=md,ipynb")
     result.assert_outcomes(passed=10, failed=7)
