@@ -29,7 +29,7 @@ def test_cache_expiry(pytester, base_args, cache_name, tmpdir):
         args += ["--check-links-cache-name", os.path.join(str(tmpdir), cache_name)]
     expected = {"passed": 3, "failed": 4}
     t0 = time.time()
-    result = pytester.runpytest(*args)
+    result = pytester.runpytest_inprocess(*args)
     t1 = time.time()
     result.assert_outcomes(**expected)
 
@@ -39,7 +39,7 @@ def test_cache_expiry(pytester, base_args, cache_name, tmpdir):
         assert_sqlite(pytester)
 
     t2 = time.time()
-    result = pytester.runpytest(*args)
+    result = pytester.runpytest_inprocess(*args)
     t3 = time.time()
     result.assert_outcomes(**expected)
 
@@ -51,7 +51,7 @@ def test_cache_expiry(pytester, base_args, cache_name, tmpdir):
     time.sleep(2)
 
     t4 = time.time()
-    result = pytester.runpytest(*args)
+    result = pytester.runpytest_inprocess(*args)
     t5 = time.time()
     result.assert_outcomes(**expected)
 
@@ -107,7 +107,7 @@ def test_cache_retry(pytester, memory_args):
 
     requests_cache.CachedSession.get = mock_get  # type:ignore
 
-    result = pytester.runpytest(*memory_args)
+    result = pytester.runpytest_inprocess(*memory_args)
 
     try:
         result.assert_outcomes(passed=5, failed=1)
@@ -125,6 +125,6 @@ def test_cache_backend_opts(pytester, base_args):
         "--check-links-cache-name",
         "foo",
     ]
-    result = pytester.runpytest(*args)
+    result = pytester.runpytest_inprocess(*args)
     result.assert_outcomes(passed=6, failed=0)
     assert_sqlite(pytester, name="foo.sqlite")

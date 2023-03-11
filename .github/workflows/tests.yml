@@ -31,10 +31,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - name: Ignore warnings on pypy
+      - name: Run the tests on pypy
         if: ${{ startsWith(matrix.python-version, 'pypy') }}
-        run: echo "PYTHONWARNINGS=ignore" >> $GITHUB_ENV
+        run: |
+          hatch run cov:nowarn -s || hatch run test:nowarn -s --lf
       - name: Run the tests
+        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
         timeout-minutes: 15
         run: |
           hatch run cov:test -s || hatch run test:test -s --lf
