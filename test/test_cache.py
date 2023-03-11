@@ -6,7 +6,7 @@ from glob import glob
 
 import pytest
 import requests_cache
-from flaky import flaky
+from flaky import flaky  # type:ignore
 
 
 def assert_sqlite(pytester, name=None, tmpdir=None, exists=True):
