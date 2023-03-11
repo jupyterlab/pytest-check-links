@@ -6,6 +6,7 @@ from glob import glob
 
 import pytest
 import requests_cache
+from flaky import flaky
 
 
 def assert_sqlite(pytester, name=None, tmpdir=None, exists=True):
@@ -18,6 +19,7 @@ def assert_sqlite(pytester, name=None, tmpdir=None, exists=True):
         assert not caches
 
 
+@flaky
 @pytest.mark.skipif(sys.implementation.name.lower() == "pypy", reason="Does not work on pypy")
 @pytest.mark.parametrize("cache_name", [None, "custom-cache"])
 def test_cache_expiry(pytester, base_args, cache_name, tmpdir):

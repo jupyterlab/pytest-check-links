@@ -48,7 +48,7 @@ Homepage = "https://github.com/jupyterlab/pytest-check-links"
 
 [project.optional-dependencies]
 cache = ["requests-cache>=0.9.7"]
-test = ["requests-cache>=0.9.7", "pre-commit", "mistune<1;python_version<\"3.10\""]
+test = ["requests-cache>=0.9.7", "pre-commit", "mistune<1;python_version<\"3.10\"", "flaky"]
 
 [project.scripts]
 pytest-check-links = "pytest_check_links.__main__:main"
