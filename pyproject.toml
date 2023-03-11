@@ -48,7 +48,7 @@ Homepage = "https://github.com/jupyterlab/pytest-check-links"
 
 [project.optional-dependencies]
 cache = ["requests-cache>=0.9.7"]
-test = ["requests-cache>=0.9.7", "pre-commit", "mistune<1;python_version<\"3.10\""]
+test = ["requests-cache>=0.9.7", "pre-commit", "mistune<1;python_version<\"3.10\"", "flaky"]
 
 [project.scripts]
 pytest-check-links = "pytest_check_links.__main__:main"
@@ -67,14 +67,14 @@ build = "make -C docs html SPHINXOPTS='-W'"
 [tool.hatch.envs.test]
 features = ["test"]
 [tool.hatch.envs.test.scripts]
-test = "python -m pytest -vv {args}"
+test = "pytest -vv {args}"
 nowarn = "test -W default {args}"
 
 [tool.hatch.envs.cov]
 features = ["test"]
 dependencies = ["coverage", "pytest-cov"]
 [tool.hatch.envs.cov.scripts]
-test = "python -m pytest -vv --cov pytest_check_links --cov-branch --cov-report term-missing:skip-covered {args}"
+test = "pytest -vv --cov pytest_check_links --cov-branch --cov-report term-missing:skip-covered {args}"
 nowarn = "test -W default {args}"
 
 [tool.hatch.envs.typing]
