@@ -31,6 +31,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - name: Ignore warnings on pypy
+        if: ${{ startsWith(matrix.python-version, 'pypy') }}
+        run: echo "PYTHONWARNINGS=ignore" >> $GITHUB_ENV
       - name: Run the tests
         timeout-minutes: 15
         run: |
