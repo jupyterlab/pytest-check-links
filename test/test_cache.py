@@ -29,6 +29,7 @@ def test_cache_expiry(pytester, base_args, cache_name, tmpdir):
         args += ["--check-links-cache-name", os.path.join(str(tmpdir), cache_name)]
     expected = {"passed": 3, "failed": 4}
     t0 = time.time()
+    pytester.plugins.append('pytest-check-links')
     result = pytester.runpytest_inprocess(*args)
     t1 = time.time()
     result.assert_outcomes(**expected)
@@ -65,6 +66,7 @@ def test_cache_memory(pytester, memory_args):
     """will the memory backend cache links inside a run?"""
     expected = dict(passed=3, failed=0)
 
+    pytester.plugins.append('pytest-check-links')
     pytester.copy_example("httpbin.md")
 
     def run(passed):
@@ -92,6 +94,7 @@ def test_cache_retry(pytester, memory_args):
     """will a Retry-After header work with cache?"""
 
     pytester.copy_example("httpbin.md")
+    pytester.plugins.append('pytest-check-links')
 
     attempts: list = []
 
@@ -118,6 +121,7 @@ def test_cache_retry(pytester, memory_args):
 
 def test_cache_backend_opts(pytester, base_args):
     pytester.copy_example("httpbin.md")
+    pytester.plugins.append('pytest-check-links')
     args = [
         *base_args,
         "--check-links-cache-backend-opt",

@@ -42,7 +42,7 @@ jobs:
           hatch run cov:test -s || hatch run test:test -s --lf
       - name: Upload coverage
         run: |
-          pip install codecov
+          pip install codecov "coverage[toml]"
           codecov
 
   test_lint:
