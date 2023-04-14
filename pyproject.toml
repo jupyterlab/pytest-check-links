@@ -72,9 +72,9 @@ nowarn = "test -W default {args}"
 
 [tool.hatch.envs.cov]
 features = ["test"]
-dependencies = ["coverage[toml]", "pytest-cov"]
+dependencies = ["coverage[toml]"]
 [tool.hatch.envs.cov.scripts]
-test = "pytest -vv --cov pytest_check_links --cov-branch --cov-report term-missing:skip-covered {args}"
+test = "coverage run -m pytest {args}"
 nowarn = "test -W default {args}"
 
 [tool.hatch.envs.typing]
