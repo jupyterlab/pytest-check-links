@@ -72,7 +72,7 @@ nowarn = "test -W default {args}"
 
 [tool.hatch.envs.cov]
 features = ["test"]
-dependencies = ["coverage", "pytest-cov"]
+dependencies = ["coverage[toml]", "pytest-cov"]
 [tool.hatch.envs.cov.scripts]
 test = "pytest -vv --cov pytest_check_links --cov-branch --cov-report term-missing:skip-covered {args}"
 nowarn = "test -W default {args}"
@@ -118,6 +118,10 @@ exclude_lines = [
   "class .*\bProtocol\\):",
 "@(abc\\.)?abstractmethod",
 ]
+
+[tool.coverage.run]
+relative_files = true
+source = ["pytest_check_links"]
 
 [tool.mypy]
 check_untyped_defs = true
