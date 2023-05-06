@@ -371,7 +371,7 @@ class LinkItem(pytest.Item):
                 uncached = True
         return uncached
 
-    def runtest(self):
+    def runtest(self):  # noqa
         """Run the test."""
         url = self.target or ""
 
@@ -430,4 +430,6 @@ def validate_extensions(extensions):
     """Validate the extensions."""
     invalid = set(extensions) - supported_extensions
     if invalid:
-        warnings.warn("Unsupported extensions for check-links: %s" % extensions_str(invalid))
+        warnings.warn(
+            "Unsupported extensions for check-links: %s" % extensions_str(invalid), stacklevel=2
+        )
