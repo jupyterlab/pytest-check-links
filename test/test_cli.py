@@ -5,7 +5,7 @@ import pytest
 
 
 def run(cmd, rc=0):
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # noqa
     stdout, stderr = proc.communicate()
     output = stdout.decode("utf-8").strip().splitlines()
     err = stderr.decode("utf-8").strip().splitlines()
