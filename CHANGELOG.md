@@ -2,6 +2,26 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.9.0
+
+([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.8.0...8c58f8f8c42c247256f03a99504165ba7646e0e0))
+
+### Maintenance and upkeep improvements
+
+- Support Python 3.8-3.12 and Handle Flaky Tests [#110](https://github.com/jupyterlab/pytest-check-links/pull/110) ([@blink1073](https://github.com/blink1073))
+- Update ruff [#106](https://github.com/jupyterlab/pytest-check-links/pull/106) ([@blink1073](https://github.com/blink1073))
+- Use local coverage [#105](https://github.com/jupyterlab/pytest-check-links/pull/105) ([@blink1073](https://github.com/blink1073))
+- Switch to pytester in tests [#103](https://github.com/jupyterlab/pytest-check-links/pull/103) ([@blink1073](https://github.com/blink1073))
+- Add more linting [#100](https://github.com/jupyterlab/pytest-check-links/pull/100) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2022-12-26&to=2023-06-19&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2022-12-26..2023-06-19&type=Issues) | [@codecov](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Acodecov+updated%3A2022-12-26..2023-06-19&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Apre-commit-ci+updated%3A2022-12-26..2023-06-19&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.8.0
 
 ([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.7.1...dafddb42b22f480303a76bb46a7042e360c2379a))
@@ -17,8 +37,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2022-04-07&to=2022-12-26&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2022-04-07..2022-12-26&type=Issues) | [@bollwyvl](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Abollwyvl+updated%3A2022-04-07..2022-12-26&type=Issues) | [@codecov](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Acodecov+updated%3A2022-04-07..2022-12-26&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Awelcome+updated%3A2022-04-07..2022-12-26&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.7.1
 
