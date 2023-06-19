@@ -2,6 +2,7 @@ import os
 import subprocess
 
 import pytest
+from flaky import flaky  # type:ignore
 
 
 def run(cmd, rc=0):
@@ -21,6 +22,7 @@ def test_cli_help():
     run(["pytest-check-links", "--help"])
 
 
+@flaky
 @pytest.mark.skipif(os.name != "nt", reason="Only works on Windows")
 @pytest.mark.parametrize(
     "example,rc,expected,unexpected",

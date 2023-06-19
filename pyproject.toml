@@ -15,17 +15,13 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
   "Topic :: Documentation",
   "Topic :: Documentation :: Sphinx",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Testing",
 ]
 keywords = ["testing", "documentation", "links", "html"]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
   "docutils",
   "html5lib",
@@ -48,7 +44,7 @@ Homepage = "https://github.com/jupyterlab/pytest-check-links"
 
 [project.optional-dependencies]
 cache = ["requests-cache>=0.9.7"]
-test = ["requests-cache>=0.9.7", "pre-commit", "mistune<1;python_version<\"3.10\"", "flaky"]
+test = ["requests-cache>=0.9.7", "pre-commit", "flaky"]
 
 [project.scripts]
 pytest-check-links = "pytest_check_links.__main__:main"

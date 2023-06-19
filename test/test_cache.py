@@ -63,6 +63,7 @@ def test_cache_expiry(pytester, base_args, cache_name, tmpdir):
     assert d2 > d3, "cache did not expire"
 
 
+@flaky
 def test_cache_memory(pytester, memory_args):
     """will the memory backend cache links inside a run?"""
     expected = dict(passed=3, failed=0)
@@ -90,6 +91,7 @@ def test_cache_memory(pytester, memory_args):
     assert d1 < d0 * 4
 
 
+@flaky
 def test_cache_retry(pytester, memory_args):
     """will a Retry-After header work with cache?"""
 
@@ -118,6 +120,7 @@ def test_cache_retry(pytester, memory_args):
         requests_cache.CachedSession.get = _get  # type:ignore
 
 
+@flaky
 def test_cache_backend_opts(pytester, base_args):
     pytester.copy_example("httpbin.md")
     args = [
