@@ -19,6 +19,7 @@ classifiers = [
   "Topic :: Documentation :: Sphinx",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Testing",
+  "Typing :: Typed"
 ]
 keywords = ["testing", "documentation", "links", "html"]
 requires-python = ">=3.8"
