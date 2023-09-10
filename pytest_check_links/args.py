@@ -18,13 +18,13 @@ class StoreExtensionsAction(argparse.Action):
             raise ValueError(msg)
         super().__init__(option_strings, dest, **kwargs)
 
-    def __call__(
+    def __call__(  # type:ignore[override]
         self,
         parser: argparse.ArgumentParser,
         namespace: argparse.Namespace,
         values: str,
         option_string: str | None = None,
-    ) -> None:  # type:ignore[override]
+    ) -> None:
         """Evaluate the action."""
         parsed = self.parse_extensions(values)
         setattr(namespace, self.dest, parsed)
@@ -37,13 +37,13 @@ class StoreExtensionsAction(argparse.Action):
 class StoreCacheAction(argparse.Action):
     """Build the cache session kwargs"""
 
-    def __call__(
+    def __call__(  # type:ignore[override]
         self,
         parser: argparse.ArgumentParser,
         namespace: argparse.Namespace,
         values: str,
         option_string: str | None = None,
-    ) -> None:  # type:ignore[override]
+    ) -> None:
         """Evaluate the action."""
         ns_name = "check_links_cache_kwargs"
         if not hasattr(namespace, ns_name):
