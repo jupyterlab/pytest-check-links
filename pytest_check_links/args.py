@@ -27,7 +27,7 @@ class StoreCacheAction(argparse.Action):
     """Build the cache session kwargs"""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        """Evalutate the action."""
+        """Evaluate the action."""
         ns_name = "check_links_cache_kwargs"
         if not hasattr(namespace, ns_name):
             setattr(namespace, ns_name, {})

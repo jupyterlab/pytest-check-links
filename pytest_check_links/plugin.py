@@ -64,7 +64,7 @@ def pytest_addoption(parser):
     group.addoption(
         "--check-links-cache-backend-opt",
         action=StoreCacheAction,
-        help="Backend-specific options for link cache, specfied as `opt:value`",
+        help="Backend-specific options for link cache, specified as `opt:value`",
     )
 
 
@@ -407,8 +407,8 @@ class LinkItem(pytest.Item):
                     exists = True
                     # only check anchors in html for now
                     if ext == ".html" and anchor and self.parent.check_anchors:
-                        with target_path.open() as fpt:
-                            parsed = html5lib.parse(fpt, namespaceHTMLElements=False)
+                        with target_path.open() as fd:
+                            parsed = html5lib.parse(fd, namespaceHTMLElements=False)
                             return self.handle_anchor(parsed, anchor)
                     break
             if not exists:
