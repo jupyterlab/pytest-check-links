@@ -1,24 +1,35 @@
 """Argparse handlers."""
+from __future__ import annotations
+
 import argparse
 import json
+from typing import Any
 
 
 class StoreExtensionsAction(argparse.Action):
     """Store extensions action."""
 
-    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+    def __init__(
+        self, option_strings: list[str], dest: str, nargs: int | None = None, **kwargs: Any
+    ) -> None:
         """Initialize the action."""
         if nargs is not None:
             msg = "nargs not allowed"
             raise ValueError(msg)
         super().__init__(option_strings, dest, **kwargs)
 
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: str,
+        option_string: str | None = None,
+    ) -> None:  # type:ignore[override]
         """Evaluate the action."""
-        values = self.parse_extensions(values)
-        setattr(namespace, self.dest, values)
+        parsed = self.parse_extensions(values)
+        setattr(namespace, self.dest, parsed)
 
-    def parse_extensions(self, csv):
+    def parse_extensions(self, csv: str) -> set[str]:
         """Parse extensions."""
         return {".%s" % ext.lstrip(".") for ext in csv.split(",")}
 
@@ -26,7 +37,13 @@ class StoreExtensionsAction(argparse.Action):
 class StoreCacheAction(argparse.Action):
     """Build the cache session kwargs"""
 
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: str,
+        option_string: str | None = None,
+    ) -> None:  # type:ignore[override]
         """Evaluate the action."""
         ns_name = "check_links_cache_kwargs"
         if not hasattr(namespace, ns_name):
