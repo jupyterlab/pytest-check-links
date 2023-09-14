@@ -7,12 +7,13 @@ these plugins with the py.test command line option
 "-p no:<plugin-name-here>".
 """
 # pragma: no cover
+from __future__ import annotations
 
 import subprocess
 import sys
 
 
-def main(args=None):
+def main(args: list[str] | None = None) -> int:
     """Main function."""
     if args is None:
         args = sys.argv[1:]

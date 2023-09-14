@@ -58,7 +58,7 @@ Caching requires the installation of `requests-cache`.
 pip install requests-cache
 ```
 
-If enabled, each occurance of a link will be checked, no matter how many times
+If enabled, each occurrence of a link will be checked, no matter how many times
 it appears in a collection of files to check.
 
 #### --check-links-cache

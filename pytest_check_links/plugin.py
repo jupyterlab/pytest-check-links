@@ -1,15 +1,19 @@
 """pytest-check-links plugin."""
+from __future__ import annotations
+
 import os
 import re
 import time
 import warnings
 from pathlib import Path
+from typing import Any, Generator, cast
+from xml.etree.ElementTree import Element
 
 import html5lib
 import pytest
 from docutils.core import publish_parts
-from requests import Request, Session
-from requests.utils import unquote  # type:ignore
+from requests import Request, Response, Session
+from requests.utils import unquote  # type:ignore[attr-defined]
 
 from .args import StoreCacheAction, StoreExtensionsAction
 
@@ -26,7 +30,7 @@ default_cache = {
 }
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser: pytest.Parser) -> None:
     """Add options to pytest."""
     group = parser.getgroup("general")
     group.addoption("--check-links", action="store_true", help="Check links for validity")
@@ -64,43 +68,48 @@ def pytest_addoption(parser):
     group.addoption(
         "--check-links-cache-backend-opt",
         action=StoreCacheAction,
-        help="Backend-specific options for link cache, specfied as `opt:value`",
+        help="Backend-specific options for link cache, specified as `opt:value`",
     )
 
 
-def pytest_configure(config):
+def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest."""
     if config.option.links_ext:
         validate_extensions(config.option.links_ext)
 
 
-def pytest_collect_file(path, parent):
+def pytest_collect_file(path: Any, parent: pytest.Collector) -> CheckLinks | None:
     """Add pytest file collection filter."""
     config = parent.config
     ignore_links = config.option.check_links_ignore
+
     if config.option.check_links:
         requests_session = ensure_requests_session(config)
         if path.ext.lower() in config.option.links_ext:
-            path = Path(path)
+            path_obj = Path(path)
             check_anchors = config.option.check_anchors
             if hasattr(CheckLinks, "from_parent"):
-                return CheckLinks.from_parent(
-                    parent,
-                    path=path,
-                    requests_session=requests_session,
-                    check_anchors=check_anchors,
-                    ignore_links=ignore_links,
+                return cast(
+                    CheckLinks,
+                    CheckLinks.from_parent(
+                        parent,
+                        path=path_obj,
+                        requests_session=requests_session,
+                        check_anchors=check_anchors,
+                        ignore_links=ignore_links,
+                    ),
                 )
             return CheckLinks(
-                path=path,
+                path=path_obj,
                 parent=parent,
                 requests_session=requests_session,
                 check_anchors=check_anchors,
                 ignore_links=ignore_links,
             )
+    return None
 
 
-def ensure_requests_session(config):
+def ensure_requests_session(config: pytest.Config) -> Session:
     """Build the singleton requests.Session (or subclass)"""
     session_attr = "check_links_requests_session"
     if not hasattr(config.option, session_attr):
@@ -114,35 +123,43 @@ def ensure_requests_session(config):
             if kwargs.get("expire_after"):
                 requests_session.remove_expired_responses()
         else:
-            requests_session = Session()  # type:ignore
+            requests_session = Session()  # type:ignore[assignment]
 
         requests_session.headers["User-Agent"] = "pytest-check-links"
 
         setattr(config.option, session_attr, requests_session)
 
-    return getattr(config.option, session_attr)
+    return cast(Session, getattr(config.option, session_attr))
 
 
 class CheckLinks(pytest.File):
     """Check the links in a file"""
 
-    def __init__(self, *, requests_session=None, check_anchors=False, ignore_links=None, **kwargs):
+    def __init__(
+        self,
+        *,
+        requests_session: Session | None = None,
+        check_anchors: bool = False,
+        ignore_links: list[str] | None = None,
+        **kwargs: Any,
+    ) -> None:
         """Initialize."""
         super().__init__(**kwargs)
         self.check_anchors = check_anchors
         self.requests_session = requests_session
         self.ignore_links = ignore_links or []
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Teardown the handler."""
-        self.requests_session.close()
+        if self.requests_session:
+            self.requests_session.close()
 
-    def _html_from_html(self):
+    def _html_from_html(self) -> str:
         """Return HTML from an HTML file"""
         with open(str(self.path), encoding=_ENC) as f:
             return f.read()
 
-    def _html_from_markdown(self):
+    def _html_from_markdown(self) -> str:
         """Return HTML from a markdown file"""
         # FIXME: use commonmark or a pluggable engine
         from nbconvert.filters import markdown2html
@@ -151,18 +168,20 @@ class CheckLinks(pytest.File):
             markdown = f.read()
         return markdown2html(markdown)
 
-    def _html_from_rst(self):
+    def _html_from_rst(self) -> str:
         """Return HTML from an rst file"""
         with open(str(self.path), encoding=_ENC) as f:
             rst = f.read()
-        return publish_parts(rst, source_path=str(self.path), writer_name="html")["html_body"]
+        return cast(
+            str, publish_parts(rst, source_path=str(self.path), writer_name="html")["html_body"]
+        )
 
-    def _items_from_notebook(self):
+    def _items_from_notebook(self) -> Generator[LinkItem, None, None]:
         """Yield LinkItems from a notebook"""
         import nbformat
         from nbconvert.filters.markdown_mistune import IPythonRenderer, MarkdownWithMath
 
-        nb = nbformat.read(str(self.path), as_version=4)
+        nb = nbformat.read(str(self.path), as_version=4)  # type:ignore[no-untyped-call]
         for cell_num, cell in enumerate(nb.cells):
             if cell.cell_type != "markdown":
                 continue
@@ -172,6 +191,8 @@ class CheckLinks(pytest.File):
             html = MarkdownWithMath(renderer=renderer).render(cell.source)
             basename = "Cell %i" % cell_num
             for item in links_in_html(basename, self, html):
+                if not item.target:
+                    continue
                 ignore = False
                 for pattern in self.ignore_links:
                     if re.match(pattern, item.target):
@@ -179,7 +200,7 @@ class CheckLinks(pytest.File):
                 if not ignore:
                     yield item
 
-    def collect(self):
+    def collect(self) -> Generator[LinkItem, None, None]:  # noqa: C901
         """Collect the test."""
         path = self.path
         if path.suffix == ".ipynb":
@@ -194,7 +215,9 @@ class CheckLinks(pytest.File):
         elif path.suffix == ".rst":
             html = self._html_from_rst()
 
-        for item in links_in_html(path, self, html):
+        for item in links_in_html(str(path), self, html):
+            if not item.target:
+                continue
             ignore = False
             for pattern in self.ignore_links:
                 if re.match(pattern, item.target):
@@ -206,17 +229,17 @@ class CheckLinks(pytest.File):
 class BrokenLinkError(Exception):
     """A broken link error."""
 
-    def __init__(self, url, error):
+    def __init__(self, url: str, error: Exception | str) -> None:
         """Initialize the error."""
         self.url = url
         self.error = error
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """The repr for the error."""
         return f"<{self.__class__.__name__} url={self.url}, error={self.error}>"
 
 
-def links_in_html(base_name, parent, html):
+def links_in_html(base_name: str, parent: CheckLinks, html: str) -> Generator[LinkItem, None, None]:
     """Yield LinkItems from a markdown cell
 
     Parsed HTML with html5lib, yielding LinkItems for testing.
@@ -268,7 +291,13 @@ class LinkItem(pytest.Item):
     parent: CheckLinks
 
     def __init__(  # noqa
-        self, name=None, parent=None, target=None, parsed=None, description="", **kwargs
+        self,
+        name: str | None = None,
+        parent: CheckLinks | None = None,
+        target: str | None = None,
+        parsed: Element | None = None,
+        description: str = "",
+        **kwargs: Any,
     ):
         """Initialize the item."""
         super().__init__(name, parent, **kwargs)
@@ -276,19 +305,19 @@ class LinkItem(pytest.Item):
         self.parsed = parsed
         self.description = description or f"{self.path}: {target}"
 
-    def repr_failure(self, excinfo):
+    def repr_failure(self, excinfo: Any) -> str:  # type:ignore[override]
         """Repr for a failure."""
         exc = excinfo.value
         if isinstance(exc, BrokenLinkError):
             return f"{exc.url}: {exc.error}"
         else:
-            return super().repr_failure(excinfo)
+            return str(super().repr_failure(excinfo))
 
-    def reportinfo(self):
+    def reportinfo(self) -> tuple[Path, int, str]:
         """Get the report information."""
         return self.path, 0, self.description
 
-    def sleep(self, headers):
+    def sleep(self, headers: dict[str, Any] | None) -> bool:
         """Handle responses or errors with a Retry-After header.
 
         https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.37
@@ -313,10 +342,12 @@ class LinkItem(pytest.Item):
 
         return True
 
-    def handle_anchor(self, parsed, anchor):
+    def handle_anchor(self, parsed: Element, anchor: str) -> None:
         """Verify an anchor exists in the parsed HTML"""
         anchors = set(parsed.findall(f'*//a[@name="{anchor}"]'))
         anchors |= set(parsed.findall(f'*//*[@id="{anchor}"]'))
+        if not self.target:
+            return
 
         if not anchors:
             raise BrokenLinkError(self.target, "Missing anchor: %s" % anchor)
@@ -326,11 +357,14 @@ class LinkItem(pytest.Item):
                 self.target, "Ambiguous anchor: %d (found %s)" % (len(anchors), anchor)
             )
 
-    def fetch_with_retries(self, url, retries=3):
+    def fetch_with_retries(self, url: str, retries: int = 3) -> Response:
         """Fetch a URL, optionally retrying after a delay (by header)"""
 
         url_no_anchor = url.split("#")[0]
         session = self.parent.requests_session
+        if session is None:
+            msg = "No session!"
+            raise RuntimeError(msg)
 
         try:
             response = session.get(url_no_anchor)
@@ -342,7 +376,7 @@ class LinkItem(pytest.Item):
             raise BrokenLinkError(url, "%s" % err) from err
 
         if response.status_code >= 400:  # noqa
-            if retries and self.sleep(response.headers):
+            if retries and self.sleep(response.headers):  # type:ignore[arg-type]
                 self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
 
@@ -350,9 +384,9 @@ class LinkItem(pytest.Item):
 
         return response
 
-    def uncache_url(self, url):
+    def uncache_url(self, url: str) -> bool:
         """Uncache a url."""
-        from requests_cache import BaseCache
+        from requests_cache import BaseCache  # type:ignore[attr-defined]
 
         uncached = False
         session = self.parent.requests_session
@@ -371,7 +405,7 @@ class LinkItem(pytest.Item):
                 uncached = True
         return uncached
 
-    def runtest(self):  # noqa
+    def runtest(self) -> None:  # noqa
         """Run the test."""
         url = self.target or ""
 
@@ -379,7 +413,7 @@ class LinkItem(pytest.Item):
             response = self.fetch_with_retries(url)
             if self.parent.check_anchors and "#" in url:
                 anchor = url.split("#")[1]
-                if anchor and "html" in response.headers.get("Content-Type"):
+                if anchor and "html" in response.headers.get("Content-Type", ""):
                     parsed = html5lib.parse(response.content, namespaceHTMLElements=False)
                     return self.handle_anchor(parsed, anchor)
         else:
@@ -393,7 +427,7 @@ class LinkItem(pytest.Item):
                 url, anchor = url.split("#")
 
             if not url and anchor:
-                if self.parent.check_anchors:
+                if self.parent.check_anchors and self.parsed:
                     self.handle_anchor(self.parsed, anchor)
                 return
 
@@ -407,8 +441,8 @@ class LinkItem(pytest.Item):
                     exists = True
                     # only check anchors in html for now
                     if ext == ".html" and anchor and self.parent.check_anchors:
-                        with target_path.open() as fpt:
-                            parsed = html5lib.parse(fpt, namespaceHTMLElements=False)
+                        with target_path.open() as fd:
+                            parsed = html5lib.parse(fd, namespaceHTMLElements=False)
                             return self.handle_anchor(parsed, anchor)
                     break
             if not exists:
@@ -416,17 +450,17 @@ class LinkItem(pytest.Item):
                 raise BrokenLinkError(url, "No such file: %s" % target_path)
 
 
-def extensions_str(extensions):
+def extensions_str(extensions: set[str]) -> str:
     """Get the extensions as a string."""
     if not extensions:
         return ""
-    extensions = ['"%s"' % e.lstrip(".") for e in extensions if e]
-    if len(extensions) == 1:
-        return extensions[0]
-    return ", ".join(extensions[:-1]) + " and %s" % extensions[-1]
+    exts = ['"%s"' % e.lstrip(".") for e in extensions if e]
+    if len(exts) == 1:
+        return exts[0]
+    return ", ".join(exts[:-1]) + " and %s" % exts[-1]
 
 
-def validate_extensions(extensions):
+def validate_extensions(extensions: set[str]) -> None:
     """Validate the extensions."""
     invalid = set(extensions) - supported_extensions
     if invalid:
