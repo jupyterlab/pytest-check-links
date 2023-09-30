@@ -126,6 +126,9 @@ exclude_lines = [
 [tool.coverage.run]
 relative_files = true
 source = ["pytest_check_links"]
+omit = [
+  "pytest_check_links/__main__.py"
+]
 
 [tool.mypy]
 files = "pytest_check_links"
