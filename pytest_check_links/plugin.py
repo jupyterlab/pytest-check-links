@@ -391,7 +391,7 @@ class LinkItem(pytest.Item):
         uncached = False
         session = self.parent.requests_session
         if session is None:
-            msg = 'No current session'
+            msg = "No current session"
             raise ValueError(msg)
         if hasattr(session, "cache"):
             request = Request("GET", url, headers=session.headers).prepare()
