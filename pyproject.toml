@@ -78,7 +78,10 @@ nowarn = "test -W default {args}"
 detached = true
 dependencies = ["pre-commit"]
 [tool.hatch.envs.lint.scripts]
-build = "pre-commit run --all-files ruff"
+build = [
+  "pre-commit run --all-files ruff",
+  "pre-commit run --all-files ruff-format"
+]
 
 [tool.hatch.envs.typing]
 dependencies = [ "pre-commit"]
@@ -130,7 +133,6 @@ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
 
 [tool.ruff]
-target-version = "py38"
 line-length = 100
 
 [tool.ruff.lint]
@@ -166,6 +168,8 @@ unfixable = [
 # N802 Function name `assertIn` should be lowercase
 # S101 Use of `assert` detected
 "test/*" = ["B011", "F841", "C408", "E402", "T201", "B007", "N802", "S101"]
+# T201 `print` found
+"*.ipynb" = ["T201"]
 
 [tool.interrogate]
 ignore-init-module=true
