@@ -156,7 +156,7 @@ class CheckLinks(pytest.File):
 
     def _html_from_html(self) -> str:
         """Return HTML from an HTML file"""
-        with open(str(self.path), encoding=_ENC) as f:
+        with Path(self.path).open(encoding=_ENC) as f:
             return f.read()
 
     def _html_from_markdown(self) -> str:
@@ -164,13 +164,13 @@ class CheckLinks(pytest.File):
         # FIXME: use commonmark or a pluggable engine
         from nbconvert.filters import markdown2html
 
-        with open(str(self.path), encoding=_ENC) as f:
+        with Path(self.path).open(encoding=_ENC) as f:
             markdown = f.read()
         return markdown2html(markdown)
 
     def _html_from_rst(self) -> str:
         """Return HTML from an rst file"""
-        with open(str(self.path), encoding=_ENC) as f:
+        with Path(self.path).open(encoding=_ENC) as f:
             rst = f.read()
         return cast(
             str, publish_parts(rst, source_path=str(self.path), writer_name="html")["html_body"]
@@ -200,7 +200,7 @@ class CheckLinks(pytest.File):
                 if not ignore:
                     yield item
 
-    def collect(self) -> Generator[LinkItem, None, None]:  # noqa: C901
+    def collect(self) -> Generator[LinkItem, None, None]:
         """Collect the test."""
         path = self.path
         if path.suffix == ".ipynb":
@@ -290,7 +290,7 @@ class LinkItem(pytest.Item):
 
     parent: CheckLinks
 
-    def __init__(  # noqa
+    def __init__(
         self,
         name: str | None = None,
         parent: CheckLinks | None = None,
@@ -310,8 +310,7 @@ class LinkItem(pytest.Item):
         exc = excinfo.value
         if isinstance(exc, BrokenLinkError):
             return f"{exc.url}: {exc.error}"
-        else:
-            return str(super().repr_failure(excinfo))
+        return str(super().repr_failure(excinfo))
 
     def reportinfo(self) -> tuple[Path, int, str]:
         """Get the report information."""
@@ -375,7 +374,7 @@ class LinkItem(pytest.Item):
 
             raise BrokenLinkError(url, "%s" % err) from err
 
-        if response.status_code >= 400:  # noqa
+        if response.status_code >= 400:
             if retries and self.sleep(response.headers):  # type:ignore[arg-type]
                 self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
@@ -405,7 +404,7 @@ class LinkItem(pytest.Item):
                 uncached = True
         return uncached
 
-    def runtest(self) -> None:  # noqa
+    def runtest(self) -> None:
         """Run the test."""
         url = self.target or ""
 
@@ -429,7 +428,7 @@ class LinkItem(pytest.Item):
             if not url and anchor:
                 if self.parent.check_anchors and self.parsed:
                     self.handle_anchor(self.parsed, anchor)
-                return
+                return None
 
             url_path = unquote(url).replace("/", os.path.sep)
             dirpath = self.path.parent
@@ -448,6 +447,7 @@ class LinkItem(pytest.Item):
             if not exists:
                 target_path = dirpath.joinpath(url_path)
                 raise BrokenLinkError(url, "No such file: %s" % target_path)
+            return None
 
 
 def extensions_str(extensions: set[str]) -> str:

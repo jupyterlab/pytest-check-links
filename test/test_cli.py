@@ -2,11 +2,11 @@ import os
 import subprocess
 
 import pytest
-from flaky import flaky  # type:ignore
+from flaky import flaky
 
 
 def run(cmd, rc=0):
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # noqa
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # noqa: S603
     stdout, stderr = proc.communicate()
     output = stdout.decode("utf-8").strip().splitlines()
     err = stderr.decode("utf-8").strip().splitlines()
@@ -27,8 +27,8 @@ def test_cli_help():
 @pytest.mark.parametrize(
     "example,rc,expected,unexpected",
     [
-        ["httpbin.md", 0, [" 6 passed"], [" failed"]],
-        ["rst.rst", 1, [" 2 failed", " 7 passed"], [" warning"]],
+        ("httpbin.md", 0, [" 6 passed"], [" failed"]),
+        ("rst.rst", 1, [" 2 failed", " 7 passed"], [" warning"]),
     ],
 )
 def test_cli_pass(testdir, example, rc, expected, unexpected):

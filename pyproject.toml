@@ -128,7 +128,6 @@ omit = [
 files = "pytest_check_links"
 python_version = "3.8"
 strict = true
-show_error_codes = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
 
@@ -136,20 +135,34 @@ warn_unreachable = true
 line-length = 100
 
 [tool.ruff.lint]
-select = [
-  "A", "B", "C", "DTZ", "E", "EM", "F", "FBT", "I", "ICN", "N",
-  "PLC", "PLE", "PLR", "PLW", "Q", "RUF", "S", "SIM", "T", "TID", "UP",
-  "W", "YTT",
+extend-select = [
+  "B",           # flake8-bugbear
+  "I",           # isort
+  "C4",          # flake8-comprehensions
+  "EM",          # flake8-errmsg
+  "ICN",         # flake8-import-conventions
+  "G",           # flake8-logging-format
+  "PGH",         # pygrep-hooks
+  "PIE",         # flake8-pie
+  "PL",          # pylint
+  "PTH",         # flake8-use-pathlib
+  "PT",          # flake8-pytest-style
+  "RET",         # flake8-return
+  "RUF",         # Ruff-specific
+  "SIM",         # flake8-simplify
+  "T20",         # flake8-print
+  "UP",          # pyupgrade
+  "YTT",         # flake8-2020
+  "EXE",         # flake8-executable
+  "PYI",         # flake8-pyi
+  "S",           # flake8-bandit
 ]
 ignore = [
-# Q000 Single quotes found but double quotes preferred
-"Q000",
-# FBT001 Boolean positional arg in function definition
-"FBT001", "FBT002", "FBT003",
-# E501 Line too long (158 > 100 characters)
-"E501",
-# SIM105 Use `contextlib.suppress(...)`
-"SIM105",
+  "PLR",      # Design related pylint codes
+  "E501",     # Line too long (158 > 100 characters)
+  "SIM105",   # Use `contextlib.suppress(...)`
+  "S101",     # Use of `assert` detected
+  "RET503",   # Missing explicit `return`
 ]
 unfixable = [
   # Don't touch print statements
@@ -166,10 +179,15 @@ unfixable = [
 # T201 `print` found
 # B007 Loop control variable `i` not used within the loop body.
 # N802 Function name `assertIn` should be lowercase
-# S101 Use of `assert` detected
-"test/*" = ["B011", "F841", "C408", "E402", "T201", "B007", "N802", "S101"]
+
+"test/*" = ["B011", "F841", "C408", "E402", "T201", "B007", "N802","PTH"]
 # T201 `print` found
 "*.ipynb" = ["T201"]
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
+parametrize-names-type = "csv"
 
 [tool.interrogate]
 ignore-init-module=true
@@ -182,4 +200,4 @@ fail-under=100
 exclude = ["test", "docs"]
 
 [tool.repo-review]
-ignore = ["PY004", "PY007", "GH102", "RTD100"]
+ignore = ["PY004", "GH102", "RTD100"]

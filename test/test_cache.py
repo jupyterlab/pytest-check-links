@@ -6,7 +6,7 @@ from glob import glob
 
 import pytest
 import requests_cache
-from flaky import flaky  # type:ignore
+from flaky import flaky
 
 
 def assert_sqlite(pytester, name=None, tmpdir=None, exists=True):
@@ -103,21 +103,21 @@ def test_cache_retry(pytester, memory_args):
 
     def mock_get(*args, **kwargs):
         response = _get(*args, **kwargs)
-        if len(attempts) < 5:  # noqa
+        if len(attempts) < 5:
             response.status_code = 502
             response.headers["Retry-After"] = "0"
         attempts.append([args, kwargs])
         return response
 
-    requests_cache.CachedSession.get = mock_get  # type:ignore
+    requests_cache.CachedSession.get = mock_get
 
     result = pytester.runpytest_inprocess(*memory_args)
 
     try:
         result.assert_outcomes(passed=5, failed=1)
-        assert len(attempts) == 10  # noqa
+        assert len(attempts) == 10
     finally:
-        requests_cache.CachedSession.get = _get  # type:ignore
+        requests_cache.CachedSession.get = _get
 
 
 @flaky
