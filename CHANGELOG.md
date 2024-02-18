@@ -2,6 +2,35 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.9.1
+
+([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.9.0...7e7f00edad437b25bd4d860651f6b6cd093a6f79))
+
+### Bugs fixed
+
+- Update for new version of requests-cache [#127](https://github.com/jupyterlab/pytest-check-links/pull/127) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- chore: update pre-commit hooks [#126](https://github.com/jupyterlab/pytest-check-links/pull/126) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- chore: update pre-commit hooks [#123](https://github.com/jupyterlab/pytest-check-links/pull/123) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- Update ruff config [#122](https://github.com/jupyterlab/pytest-check-links/pull/122) ([@blink1073](https://github.com/blink1073))
+- chore: update pre-commit hooks [#120](https://github.com/jupyterlab/pytest-check-links/pull/120) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- Clean up lint handling [#119](https://github.com/jupyterlab/pytest-check-links/pull/119) ([@blink1073](https://github.com/blink1073))
+- Adopt ruff format [#118](https://github.com/jupyterlab/pytest-check-links/pull/118) ([@blink1073](https://github.com/blink1073))
+- chore: update pre-commit hooks [#117](https://github.com/jupyterlab/pytest-check-links/pull/117) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- Ignore __main__ for coverage [#116](https://github.com/jupyterlab/pytest-check-links/pull/116) ([@blink1073](https://github.com/blink1073))
+- Bump actions/checkout from 3 to 4 [#115](https://github.com/jupyterlab/pytest-check-links/pull/115) ([@dependabot](https://github.com/dependabot))
+- Adopt sp-repo-review [#114](https://github.com/jupyterlab/pytest-check-links/pull/114) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2023-06-19&to=2024-02-18&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2023-06-19..2024-02-18&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Adependabot+updated%3A2023-06-19..2024-02-18&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Apre-commit-ci+updated%3A2023-06-19..2024-02-18&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.9.0
 
 ([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.8.0...8c58f8f8c42c247256f03a99504165ba7646e0e0))
@@ -19,8 +48,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2022-12-26&to=2023-06-19&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2022-12-26..2023-06-19&type=Issues) | [@codecov](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Acodecov+updated%3A2022-12-26..2023-06-19&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Apre-commit-ci+updated%3A2022-12-26..2023-06-19&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.8.0
 
