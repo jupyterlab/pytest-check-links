@@ -121,7 +121,7 @@ def ensure_requests_session(config: pytest.Config) -> Session:
             kwargs.update(conf_kwargs)
             requests_session = CachedSession(**kwargs)  # type:ignore[arg-type]
             if kwargs.get("expire_after"):
-                requests_session.remove_expired_responses()
+                requests_session.cache.delete(expired=True)
         else:
             requests_session = Session()  # type:ignore[assignment]
 
