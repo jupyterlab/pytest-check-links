@@ -413,7 +413,7 @@ class LinkItem(pytest.Item):
             if self.parent.check_anchors and "#" in url:
                 anchor = url.split("#")[1]
                 if anchor and "html" in response.headers.get("Content-Type", ""):
-                    parsed = html5lib.parse(response.content, namespaceHTMLElements=False)  # type:ignore[call-overload]
+                    parsed = html5lib.parse(response.content, namespaceHTMLElements=False)
                     return self.handle_anchor(parsed, anchor)
         else:
             if url.startswith("/"):
