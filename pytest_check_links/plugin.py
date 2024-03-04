@@ -5,8 +5,9 @@ import os
 import re
 import time
 import warnings
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Generator, cast
+from typing import Any, cast
 from xml.etree.ElementTree import Element
 
 import html5lib
