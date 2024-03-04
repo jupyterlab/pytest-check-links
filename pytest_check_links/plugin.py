@@ -78,15 +78,15 @@ def pytest_configure(config: pytest.Config) -> None:
         validate_extensions(config.option.links_ext)
 
 
-def pytest_collect_file(path: Any, parent: pytest.Collector) -> CheckLinks | None:
+def pytest_collect_file(collection_path: Any, parent: pytest.Collector) -> CheckLinks | None:
     """Add pytest file collection filter."""
     config = parent.config
     ignore_links = config.option.check_links_ignore
 
     if config.option.check_links:
         requests_session = ensure_requests_session(config)
-        if path.ext.lower() in config.option.links_ext:
-            path_obj = Path(path)
+        if collection_path.ext.lower() in config.option.links_ext:
+            path_obj = Path(collection_path)
             check_anchors = config.option.check_anchors
             if hasattr(CheckLinks, "from_parent"):
                 return cast(
