@@ -2,6 +2,29 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.9.2
+
+([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.9.1...d132b588ac8fb272e1e4c8ab6d4225c9735ee41f))
+
+### Bugs fixed
+
+- Pin pytest 7 [#134](https://github.com/jupyterlab/pytest-check-links/pull/134) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- Fix html5lib typing [#131](https://github.com/jupyterlab/pytest-check-links/pull/131) ([@blink1073](https://github.com/blink1073))
+- Fix html5lib typing [#130](https://github.com/jupyterlab/pytest-check-links/pull/130) ([@blink1073](https://github.com/blink1073))
+- Bump the actions group with 1 update [#129](https://github.com/jupyterlab/pytest-check-links/pull/129) ([@dependabot](https://github.com/dependabot))
+- Enforce pytest 7 [#128](https://github.com/jupyterlab/pytest-check-links/pull/128) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2024-02-18&to=2024-03-04&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2024-02-18..2024-03-04&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Adependabot+updated%3A2024-02-18..2024-03-04&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.9.1
 
 ([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.9.0...7e7f00edad437b25bd4d860651f6b6cd093a6f79))
@@ -28,8 +51,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2023-06-19&to=2024-02-18&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2023-06-19..2024-02-18&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Adependabot+updated%3A2023-06-19..2024-02-18&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Apre-commit-ci+updated%3A2023-06-19..2024-02-18&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.9.0
 
