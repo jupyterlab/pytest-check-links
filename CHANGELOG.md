@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.9.3
+
+([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.9.2...8d2825ef59634ac5947f40faa692bb7b6e34a373))
+
+### Maintenance and upkeep improvements
+
+- Update Release Scripts [#137](https://github.com/jupyterlab/pytest-check-links/pull/137) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2024-03-04&to=2024-03-12&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2024-03-04..2024-03-12&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.9.2
 
 ([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.9.1...d132b588ac8fb272e1e4c8ab6d4225c9735ee41f))
@@ -22,8 +38,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2024-02-18&to=2024-03-04&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2024-02-18..2024-03-04&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Adependabot+updated%3A2024-02-18..2024-03-04&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.9.1
 
