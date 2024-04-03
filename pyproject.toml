@@ -29,7 +29,7 @@ dependencies = [
   "nbconvert",
   "nbformat",
   "pytest >=7.0,<9",
-  "requests",
+  "requests >=2.22",
 ]
 
 [[project.authors]]
