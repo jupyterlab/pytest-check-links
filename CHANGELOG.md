@@ -2,6 +2,23 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.10.0
+
+([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.9.3...5eda4084e1a4180148312a3d21a7ce2b34f89532))
+
+### Maintenance and upkeep improvements
+
+- Bump the actions group with 1 update [#136](https://github.com/jupyterlab/pytest-check-links/pull/136) ([@dependabot](https://github.com/dependabot))
+- Support Pytest 8.1 [#135](https://github.com/jupyterlab/pytest-check-links/pull/135) ([@krassowski](https://github.com/krassowski))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2024-03-12&to=2024-04-03&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2024-03-12..2024-04-03&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Adependabot+updated%3A2024-03-12..2024-04-03&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Akrassowski+updated%3A2024-03-12..2024-04-03&type=Issues) | [@mr-c](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Amr-c+updated%3A2024-03-12..2024-04-03&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Awelcome+updated%3A2024-03-12..2024-04-03&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.9.3
 
 ([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.9.2...8d2825ef59634ac5947f40faa692bb7b6e34a373))
@@ -15,8 +32,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2024-03-04&to=2024-03-12&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2024-03-04..2024-03-12&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.9.2
 
