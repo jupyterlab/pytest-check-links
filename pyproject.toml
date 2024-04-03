@@ -24,7 +24,7 @@ classifiers = [
 keywords = ["testing", "documentation", "links", "html"]
 requires-python = ">=3.8"
 dependencies = [
-  "docutils>0.20.1",
+  "docutils>=0.20.1",
   "html5lib>=1.1",
   "nbconvert>=7.1",
   "nbformat>=5.0.2",
