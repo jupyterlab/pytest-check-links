@@ -28,7 +28,7 @@ dependencies = [
   "html5lib",
   "nbconvert",
   "nbformat",
-  "pytest >=8.1,<9",
+  "pytest >=7.0,<9",
   "requests",
 ]
 
