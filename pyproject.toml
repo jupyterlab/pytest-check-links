@@ -25,7 +25,7 @@ keywords = ["testing", "documentation", "links", "html"]
 requires-python = ">=3.8"
 dependencies = [
   "docutils",
-  "html5lib",
+  "html5lib>=1.1",
   "nbconvert",
   "nbformat",
   "pytest >=7.0,<9",
