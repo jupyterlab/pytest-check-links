@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.10.1
+
+([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.10.0...b7433fb2cd74f99efb8a07e5275a71bc707600b8))
+
+### Maintenance and upkeep improvements
+
+- Fix min dependencies [#138](https://github.com/jupyterlab/pytest-check-links/pull/138) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2024-04-03&to=2024-04-10&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2024-04-03..2024-04-10&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.10.0
 
 ([Full Changelog](https://github.com/jupyterlab/pytest-check-links/compare/v0.9.3...5eda4084e1a4180148312a3d21a7ce2b34f89532))
@@ -16,8 +32,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlab/pytest-check-links/graphs/contributors?from=2024-03-12&to=2024-04-03&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Ablink1073+updated%3A2024-03-12..2024-04-03&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Adependabot+updated%3A2024-03-12..2024-04-03&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Akrassowski+updated%3A2024-03-12..2024-04-03&type=Issues) | [@mr-c](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Amr-c+updated%3A2024-03-12..2024-04-03&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyterlab%2Fpytest-check-links+involves%3Awelcome+updated%3A2024-03-12..2024-04-03&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.9.3
 
