@@ -425,7 +425,7 @@ class LinkItem(pytest.Item):
                 url, anchor = url.split("#")
 
             if not url and anchor:
-                if self.parent.check_anchors and self.parsed:
+                if self.parent.check_anchors and self.parsed is not None and len(self.parsed):
                     self.handle_anchor(self.parsed, anchor)
                 return None
 
