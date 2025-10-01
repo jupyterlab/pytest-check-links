@@ -33,6 +33,10 @@ pytest --check-links mynotebook.ipynb
 
 A comma-separated list of extensions to check
 
+#### --check-links-allow-absolute
+
+Allow absolute links (links starting with `/`).
+
 #### --check-anchors
 
 Also check whether links with `#anchors` HTML files (either local, or with

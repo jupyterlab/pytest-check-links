@@ -34,6 +34,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     """Add options to pytest."""
     group = parser.getgroup("general")
     group.addoption("--check-links", action="store_true", help="Check links for validity")
+    group.addoption(
+        "--check-links-allow-absolute",
+        action="store_true",
+        help="Permitabsolute links (links which start with '/')",
+    )
     group.addoption("--check-anchors", action="store_true", help="Check link anchors for validity")
     group.addoption(
         "--links-ext",
@@ -82,6 +87,7 @@ def pytest_collect_file(file_path: Path, parent: pytest.Collector) -> CheckLinks
     """Add pytest file collection filter."""
     config = parent.config
     ignore_links = config.option.check_links_ignore
+    allow_absolute = config.option.check_links_allow_absolute
 
     if config.option.check_links:
         requests_session = ensure_requests_session(config)
@@ -94,6 +100,7 @@ def pytest_collect_file(file_path: Path, parent: pytest.Collector) -> CheckLinks
                         parent,
                         path=file_path,
                         requests_session=requests_session,
+                        allow_absolute=allow_absolute,
                         check_anchors=check_anchors,
                         ignore_links=ignore_links,
                     ),
@@ -102,6 +109,7 @@ def pytest_collect_file(file_path: Path, parent: pytest.Collector) -> CheckLinks
                 path=file_path,
                 parent=parent,
                 requests_session=requests_session,
+                allow_absolute=allow_absolute,
                 check_anchors=check_anchors,
                 ignore_links=ignore_links,
             )
@@ -138,12 +146,14 @@ class CheckLinks(pytest.File):
         self,
         *,
         requests_session: Session | None = None,
+        allow_absolute: bool = False,
         check_anchors: bool = False,
         ignore_links: list[str] | None = None,
         **kwargs: Any,
     ) -> None:
         """Initialize."""
         super().__init__(**kwargs)
+        self.allow_absolute = allow_absolute
         self.check_anchors = check_anchors
         self.requests_session = requests_session
         self.ignore_links = ignore_links or []
@@ -415,7 +425,7 @@ class LinkItem(pytest.Item):
                     parsed = html5lib.parse(response.content, namespaceHTMLElements=False)
                     return self.handle_anchor(parsed, anchor)
         else:
-            if url.startswith("/"):
+            if not self.parent.allow_absolute and url.startswith("/"):
                 raise BrokenLinkError(url, "absolute path link")
             # relative URL
             anchor = None
