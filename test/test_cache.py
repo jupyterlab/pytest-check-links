@@ -63,13 +63,8 @@ def test_cache_expiry(pytester, base_args, cache_name, tmpdir):
     assert d2 > d3, "cache did not expire"
 
 
-@flaky
-def test_cache_memory(pytester, memory_args):
+def test_cache_memory(pytester, memory_args, local_links_md):
     """will the memory backend cache links inside a run?"""
-    expected = dict(passed=3, failed=0)
-
-    pytester.copy_example("httpbin.md")
-
     def run(passed):
         t0 = time.time()
         result = pytester.runpytest_subprocess(*memory_args)
@@ -82,21 +77,17 @@ def test_cache_memory(pytester, memory_args):
 
     for i in range(5):
         shutil.copy(
-            os.path.join(str(pytester.path), "httpbin.md"),
-            os.path.join(str(pytester.path), f"httpbin{i}.md"),
+            os.path.join(str(pytester.path), local_links_md),
+            os.path.join(str(pytester.path), f"local_links{i}.md"),
         )
 
     d1 = run(36)
-    # allow a healthy savings margin for network flake
-    assert d1 < d0 * 4
+    # local server is fast, so allow generous margin
+    assert d1 < d0 * 6
 
 
-@flaky
-def test_cache_retry(pytester, memory_args):
+def test_cache_retry(pytester, memory_args, local_links_md):
     """will a Retry-After header work with cache?"""
-
-    pytester.copy_example("httpbin.md")
-
     attempts: list = []
 
     _get = requests_cache.CachedSession.get
@@ -120,9 +111,8 @@ def test_cache_retry(pytester, memory_args):
         requests_cache.CachedSession.get = _get
 
 
-@flaky
-def test_cache_backend_opts(pytester, base_args):
-    pytester.copy_example("httpbin.md")
+def test_cache_backend_opts(pytester, base_args, local_links_md):
+    """Test cache backend options work correctly."""
     args = [
         *base_args,
         "--check-links-cache-backend-opt",
