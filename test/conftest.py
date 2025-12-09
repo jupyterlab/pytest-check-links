@@ -31,14 +31,16 @@ def _delay_handler(request):
 def local_links_md(pytester, local_server):
     """Create a markdown file with links to local server (replaces httpbin.md)."""
     base_url = f"http://{local_server.host}:{local_server.port}"
-    content = "\n".join([
-        f"- [one]({base_url}/delay#1)",
-        f"- [two]({base_url}/delay#2)",
-        f"- [three]({base_url}/delay#3)",
-        f"- [four]({base_url}/delay#4)",
-        f"- [five]({base_url}/delay#5)",
-        f"- [six]({base_url}/delay#6)",
-    ])
+    content = "\n".join(
+        [
+            f"- [one]({base_url}/delay#1)",
+            f"- [two]({base_url}/delay#2)",
+            f"- [three]({base_url}/delay#3)",
+            f"- [four]({base_url}/delay#4)",
+            f"- [five]({base_url}/delay#5)",
+            f"- [six]({base_url}/delay#6)",
+        ]
+    )
     pytester.makefile(".md", local_links=content)
     return "local_links.md"
 

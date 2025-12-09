@@ -65,6 +65,7 @@ def test_cache_expiry(pytester, base_args, cache_name, tmpdir):
 
 def test_cache_memory(pytester, memory_args, local_links_md):
     """will the memory backend cache links inside a run?"""
+
     def run(passed):
         t0 = time.time()
         result = pytester.runpytest_subprocess(*memory_args)
