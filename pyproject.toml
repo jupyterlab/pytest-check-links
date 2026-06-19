@@ -15,6 +15,11 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Documentation",
   "Topic :: Documentation :: Sphinx",
   "Topic :: Software Development :: Quality Assurance",
@@ -22,7 +27,7 @@ classifiers = [
   "Typing :: Typed"
 ]
 keywords = ["testing", "documentation", "links", "html"]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
   "docutils>=0.20.1",
   "html5lib>=1.1",
@@ -55,11 +60,6 @@ check-links = "pytest_check_links.plugin"
 
 [tool.hatch.version]
 path = "pytest_check_links/_version.py"
-
-[tool.hatch.envs.docs]
-features = ["docs"]
-[tool.hatch.envs.docs.scripts]
-build = "make -C docs html SPHINXOPTS='-W'"
 
 [tool.hatch.envs.test]
 features = ["test"]
@@ -126,7 +126,7 @@ omit = [
 
 [tool.mypy]
 files = "pytest_check_links"
-python_version = "3.8"
+python_version = "3.10"
 strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
@@ -197,7 +197,7 @@ ignore-property-decorators=true
 ignore-nested-functions=true
 ignore-nested-classes=true
 fail-under=100
-exclude = ["test", "docs"]
+exclude = ["test", "docs", ".hatch"]
 
 [tool.repo-review]
 ignore = ["PY004", "GH102", "RTD100"]

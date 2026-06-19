@@ -4,8 +4,12 @@ on:
   push:
     branches: ["main"]
   pull_request:
+  workflow_dispatch:
   schedule:
-    - cron: "0 8 * * *"
+    - cron: "0 8 * * 0"
+
+permissions:
+  contents: read
 
 defaults:
   run:
@@ -18,16 +22,16 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-        python-version: ["3.8", "3.11"]
+        python-version: ["3.10", "3.14"]
         include:
-          - os: windows-latest
-            python-version: "3.9"
           - os: ubuntu-latest
-            python-version: "pypy-3.8"
-          - os: ubuntu-latest
-            python-version: "3.12"
+            python-version: "3.11"
           - os: macos-latest
-            python-version: "3.10"
+            python-version: "3.12"
+          - os: windows-latest
+            python-version: "3.13"
+          - os: ubuntu-latest
+            python-version: "pypy-3.10"
     steps:
       - uses: actions/checkout@v4
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
@@ -63,7 +67,7 @@ jobs:
           hatch run typing:test
           hatch run lint:build
           pipx run interrogate -v .
-          pipx run doc8 --max-line-length=200  --ignore-path=docs/source/other/full-config.rst
+          pipx run doc8 --max-line-length=200 --ignore-path=.hatch --ignore-path=docs/source/other/full-config.rst
 
   test_minimum_versions:
     name: Test Minimum Versions
@@ -86,7 +90,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
-          python_version: "3.11"
+          python_version: "3.14"
       - name: Run the tests
         run: |
           export PIP_PRE=1

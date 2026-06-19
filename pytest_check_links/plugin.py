@@ -5,8 +5,9 @@ import os
 import re
 import time
 import warnings
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Generator, cast
+from typing import Any, cast
 from xml.etree.ElementTree import Element
 
 import html5lib
@@ -88,15 +89,12 @@ def pytest_collect_file(file_path: Path, parent: pytest.Collector) -> CheckLinks
         if file_path.suffix.lower() in config.option.links_ext:
             check_anchors = config.option.check_anchors
             if hasattr(CheckLinks, "from_parent"):
-                return cast(
-                    CheckLinks,
-                    CheckLinks.from_parent(
-                        parent,
-                        path=file_path,
-                        requests_session=requests_session,
-                        check_anchors=check_anchors,
-                        ignore_links=ignore_links,
-                    ),
+                return CheckLinks.from_parent(
+                    parent,
+                    path=file_path,
+                    requests_session=requests_session,
+                    check_anchors=check_anchors,
+                    ignore_links=ignore_links,
                 )
             return CheckLinks(
                 path=file_path,
@@ -171,9 +169,7 @@ class CheckLinks(pytest.File):
         """Return HTML from an rst file"""
         with Path(self.path).open(encoding=_ENC) as f:
             rst = f.read()
-        return cast(
-            str, publish_parts(rst, source_path=str(self.path), writer_name="html")["html_body"]
-        )
+        return publish_parts(rst, source_path=str(self.path), writer_name="html")["html_body"]
 
     def _items_from_notebook(self) -> Generator[LinkItem, None, None]:
         """Yield LinkItems from a notebook"""
