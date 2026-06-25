@@ -13,6 +13,7 @@ from xml.etree.ElementTree import Element
 import html5lib
 import pytest
 from docutils.core import publish_parts
+from docutils.writers.html4css1 import Writer as HTMLWriter
 from requests import Request, Response, Session
 from requests.utils import unquote  # type:ignore[attr-defined]
 
@@ -169,7 +170,7 @@ class CheckLinks(pytest.File):
         """Return HTML from an rst file"""
         with Path(self.path).open(encoding=_ENC) as f:
             rst = f.read()
-        return publish_parts(rst, source_path=str(self.path), writer_name="html")["html_body"]
+        return publish_parts(rst, source_path=str(self.path), writer=HTMLWriter())["html_body"]
 
     def _items_from_notebook(self) -> Generator[LinkItem, None, None]:
         """Yield LinkItems from a notebook"""
