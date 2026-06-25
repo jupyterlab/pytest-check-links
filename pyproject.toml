@@ -33,7 +33,7 @@ dependencies = [
   "html5lib>=1.1",
   "nbconvert>=7.1",
   "nbformat>=5.1",
-  "pytest >=7.0,<9",
+  "pytest >=7.0",
   "requests >=2.22",
 ]
 
@@ -50,7 +50,7 @@ Homepage = "https://github.com/jupyterlab/pytest-check-links"
 
 [project.optional-dependencies]
 cache = ["requests-cache>=0.9.7"]
-test = ["requests-cache>=0.9.7", "pre-commit", "flaky"]
+test = ["requests-cache>=0.9.7", "pre-commit", "flaky", "pytest-httpserver>=1.0.0"]
 
 [project.scripts]
 pytest-check-links = "pytest_check_links.__main__:main"
