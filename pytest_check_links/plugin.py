@@ -7,7 +7,7 @@ import time
 import warnings
 from collections.abc import Generator
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, NoReturn, cast
 from xml.etree.ElementTree import Element
 
 import html5lib
@@ -15,9 +15,10 @@ import pytest
 from docutils.core import publish_parts
 from docutils.writers.html4css1 import Writer as HTMLWriter
 from requests import Request, Response, Session
+from requests.exceptions import Timeout
 from requests.utils import unquote  # type:ignore[attr-defined]
 
-from .args import StoreCacheAction, StoreExtensionsAction
+from .args import StoreCacheAction, StoreExtensionsAction, parse_status_codes, parse_timeout
 
 _ENC = "utf8"
 
@@ -28,7 +29,7 @@ default_cache = {
     "cache_name": ".pytest-check-links-cache",
     "backend": None,
     "expire_after": None,
-    "allowable_codes": list(range(200, 512)),
+    "allowable_codes": list(range(200, 400)),
 }
 
 
@@ -71,6 +72,22 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         "--check-links-cache-backend-opt",
         action=StoreCacheAction,
         help="Backend-specific options for link cache, specified as `opt:value`",
+    )
+    group.addoption(
+        "--check-links-request-timeout",
+        type=parse_timeout,
+        help="Request timeout in seconds when checking external links",
+    )
+    group.addoption(
+        "--check-links-transient-status-codes",
+        type=parse_status_codes,
+        help="HTTP response codes to treat as transient failures",
+    )
+    group.addoption(
+        "--check-links-transient-result",
+        choices=["skip", "fail"],
+        default="fail",
+        help="Result for transient failures",
     )
 
 
@@ -117,9 +134,16 @@ def ensure_requests_session(config: pytest.Config) -> Session:
             conf_kwargs = getattr(config.option, "check_links_cache_kwargs", {})
             kwargs = dict(default_cache)
             kwargs.update(conf_kwargs)
+            allowable_codes_opt = kwargs.get("allowable_codes")
+            if isinstance(allowable_codes_opt, str):
+                allowable_codes = parse_status_codes(allowable_codes_opt)
+            else:
+                allowable_codes = list(cast(Any, allowable_codes_opt or []))
+            kwargs["allowable_codes"] = allowable_codes
             requests_session = CachedSession(**kwargs)  # type:ignore[arg-type]
             if kwargs.get("expire_after"):
                 requests_session.cache.delete(expired=True)
+            purge_disallowed_cache(requests_session, allowable_codes)
         else:
             requests_session = Session()  # type:ignore[assignment]
 
@@ -128,6 +152,35 @@ def ensure_requests_session(config: pytest.Config) -> Session:
         setattr(config.option, session_attr, requests_session)
 
     return cast(Session, getattr(config.option, session_attr))
+
+
+def purge_disallowed_cache(session: Session, allowable_codes: list[int]) -> None:
+    """Remove cached responses outside the active cache status allowlist."""
+    cache = getattr(session, "cache", None)
+    if cache is None or not hasattr(cache, "filter") or not hasattr(cache, "delete"):
+        return
+
+    allowed = set(allowable_codes)
+    keys = []
+    for response in cache.filter():
+        if getattr(response, "status_code", None) in allowed:
+            continue
+        key = getattr(response, "cache_key", None)
+        request = getattr(response, "request", None)
+        if key is None and request is not None and hasattr(cache, "create_key"):
+            key = cache.create_key(request)
+        if key is not None:
+            keys.append(key)
+
+    if keys:
+        cache.delete(*keys)
+
+
+def session_caches_status(session: Session, status_code: int) -> bool:
+    """Whether a cached session is configured to cache a status code."""
+    settings = getattr(session, "settings", None)
+    allowable_codes = getattr(settings, "allowable_codes", None)
+    return allowable_codes is not None and status_code in allowable_codes
 
 
 class CheckLinks(pytest.File):
@@ -352,6 +405,13 @@ class LinkItem(pytest.Item):
                 self.target, "Ambiguous anchor: %d (found %s)" % (len(anchors), anchor)
             )
 
+    def handle_transient_failure(self, url: str, error: str) -> NoReturn:
+        """Report a transient link failure."""
+        message = f"transient link check failure: {error}"
+        if self.config.option.check_links_transient_result == "skip":
+            pytest.skip(f"{message} for {url}")
+        raise BrokenLinkError(url, message)
+
     def fetch_with_retries(self, url: str, retries: int = 3) -> Response:
         """Fetch a URL, optionally retrying after a delay (by header)"""
 
@@ -361,8 +421,15 @@ class LinkItem(pytest.Item):
             msg = "No session!"
             raise RuntimeError(msg)
 
+        timeout = self.config.option.check_links_request_timeout
+        kwargs = {"timeout": timeout} if timeout is not None else {}
+
         try:
-            response = session.get(url_no_anchor)
+            response = session.get(url_no_anchor, **kwargs)
+        except Timeout as err:
+            if timeout is not None:
+                self.handle_transient_failure(url, f"timeout: {err}")
+            raise BrokenLinkError(url, f"{err}") from err
         except Exception as err:
             if hasattr(err, "headers") and retries and self.sleep(err.headers):
                 self.uncache_url(url_no_anchor)
@@ -375,7 +442,16 @@ class LinkItem(pytest.Item):
                 self.uncache_url(url_no_anchor)
                 return self.fetch_with_retries(url, retries=retries - 1)
 
-            raise BrokenLinkError(url, "%d: %s" % (response.status_code, response.reason))
+            if hasattr(session, "cache") and not session_caches_status(
+                session, response.status_code
+            ):
+                self.uncache_url(url_no_anchor)
+
+            error = f"{response.status_code}: {response.reason}"
+            transient_codes = self.config.option.check_links_transient_status_codes or []
+            if response.status_code in transient_codes:
+                self.handle_transient_failure(url, error)
+            raise BrokenLinkError(url, error)
 
         return response
 

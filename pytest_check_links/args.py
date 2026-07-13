@@ -3,7 +3,55 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from typing import Any
+
+
+def parse_status_codes(spec: str) -> list[int]:
+    """Parse HTTP status codes and ranges."""
+    codes: set[int] = set()
+    for token in re.split(r"[\s,]+", spec.strip()):
+        if not token:
+            continue
+
+        if ".." in token:
+            parts = token.split("..", 1)
+        elif "-" in token:
+            parts = token.split("-", 1)
+        else:
+            parts = [token]
+
+        try:
+            if len(parts) == 1:
+                start = end = int(parts[0])
+            else:
+                start, end = int(parts[0]), int(parts[1])
+        except ValueError as err:
+            msg = f"Invalid HTTP status code: {token}"
+            raise argparse.ArgumentTypeError(msg) from err
+
+        if start > end:
+            msg = f"Invalid HTTP status range: {token}"
+            raise argparse.ArgumentTypeError(msg)
+        if start < 100 or end > 599:
+            msg = f"Invalid HTTP status code: {token}"
+            raise argparse.ArgumentTypeError(msg)
+        codes.update(range(start, end + 1))
+
+    return sorted(codes)
+
+
+def parse_timeout(spec: str) -> float:
+    """Parse a positive request timeout."""
+    try:
+        timeout = float(spec)
+    except ValueError as err:
+        msg = f"Invalid request timeout: {spec}"
+        raise argparse.ArgumentTypeError(msg) from err
+    if timeout <= 0:
+        msg = "Request timeout must be greater than 0"
+        raise argparse.ArgumentTypeError(msg)
+    return timeout
 
 
 class StoreExtensionsAction(argparse.Action):
@@ -54,6 +102,8 @@ class StoreCacheAction(argparse.Action):
             kwargs["cache_name"] = values
         elif dest == "expire_after":
             kwargs["expire_after"] = float(values)
+        elif dest == "allowable_codes":
+            kwargs["allowable_codes"] = parse_status_codes(values)
         elif dest == "backend_opt":
             key, value = str(values).split(":", 1)
             try:

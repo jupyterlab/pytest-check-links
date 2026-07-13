@@ -50,6 +50,24 @@ such as a Changelog. GitHub has rate limiting, which would normally cause these 
 pytest --check-links --check-links-ignore "https://github.com/.*/pull/.*" CHANGELOG.md
 ```
 
+#### --check-links-request-timeout
+
+> default: `None` (unset)
+
+Request timeout in seconds for external links.
+
+#### --check-links-transient-status-codes
+
+HTTP status codes to treat as transient failures, provided as comma-separated
+codes and ranges, such as `408,429,503..504`. Spaces are also accepted inside
+a quoted value, such as `"408 429 503..504"`.
+
+#### --check-links-transient-result
+
+> default: `fail`
+
+Result for transient failures. Allowed values are `skip` and `fail`.
+
 ### Cache
 
 Caching requires the installation of `requests-cache`.
@@ -91,17 +109,26 @@ for more information.
 
 Time to cache link responses (seconds).
 
+#### --check-links-cache-allowable-codes
+
+> default: `200..399`
+
+HTTP response codes to cache, provided as comma-separated codes and ranges,
+such as `200,301,304`. Spaces are also accepted inside a quoted value, such as
+`"200 301 304"`.
+
 #### --check-links-cache-backend-opt
 
 Backend-specific options for link cache, provided as `key:value`. These are passed
 directly to the `requests_cache.CachedSession` constructor, as they vary depending
 on the backend.
 
-Values will be parsed as JSON first, so to overload the default of caching all
-HTTP response codes (which requires a list of `int`s):
+Values will be parsed as JSON first.
+
+For example:
 
 ```bash
---check-links-backend-opt allowable_codes:[200]
+--check-links-cache-backend-opt allowable_codes:[200]
 ```
 
 ## Code Styling
